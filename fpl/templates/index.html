@@ -4,130 +4,129 @@
     <title>FPL Points Calculator</title>
      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap">
     <style>
-body {
-    font-family: 'Poppins', sans-serif;
-    background-color: black;
-    margin: 0;
-    padding: 0;
-    color: #f0f0f0;
-}
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: black;
+            margin: 0;
+            padding: 0;
+            color: #f0f0f0;
+        }
 
-h1 {
-    text-align: center;
-    margin-top: 30px;
-}
+        h1 {
+            text-align: center;
+            margin-top: 30px;
+        }
 
-form {
-    max-width: 900px;
-    margin: 0 auto;
-    background-color: #222;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+        form {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #222;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
 
-h2 {
-    font-size: 24px;
-    margin-top: 15px;
-}
+        h2 {
+            font-size: 24px;
+            margin-top: 15px;
+        }
 
-select, button {
-    width: 100%;
-    padding: 10px;
-    margin: 5px 0;
-    border: 1px solid #444;
-    border-radius: 3px;
-    font-size: 16px;
-    color: #333;
-    background-color: #222;
-}
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #444;
+            border-radius: 3px;
+            font-size: 16px;
+            color: #333;
+            background-color: #222;
+        }
 
-button {
-    background-color: #39FF14;
-    color: #000;
-    cursor: pointer;
-    border: none;
-}
+        button {
+            background-color: #39FF14;
+            color: #000;
+            cursor: pointer;
+            border: none;
+        }
 
-button:hover {
-    background-color: #37D916;
-}
+        button:hover {
+            background-color: #37D916;
+        }
 
-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 20px;
-}
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
 
-th, td {
-    border: 1px solid #444;
-    text-align: center;
-    padding: 8px;
-}
+        th, td {
+            border: 1px solid #444;
+            text-align: center;
+            padding: 8px;
+        }
 
-th {
-    background-color: #333;
-    color: #f0f0f0;
-}
+        th {
+            background-color: #333;
+            color: #f0f0f0;
+        }
 
-th[colspan="3"] {
-    background-color: #444;
-}
+        th[colspan="3"] {
+            background-color: #444;
+        }
 
-tr:nth-child(even) {
-    background-color: #222;
-}
+        tr:nth-child(even) {
+            background-color: #222;
+        }
 
-tr:hover {
-    background-color: #444;
-}
+        tr:hover {
+            background-color: #444;
+        }
 
-.win-cell {
-    background-color: #00FF85; /* Neon green for winning team */
-}
+        .win-cell {
+            background-color: #00FF85; /* Neon green for winning team */
+        }
 
-.lose-cell {
-    background-color: #E90052; /* Neon red for losing team */
-}
+        .lose-cell {
+            background-color: #E90052; /* Neon red for losing team */
+        }
 
-.tie-cell {
-    background-color: #333; /* Dark gray for tied teams */
-}
+        .tie-cell {
+            background-color: #333; /* Dark gray for tied teams */
+        }
 
-.team-count-container {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    background-color: #333; /* Dark gray background */
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    margin-top: 10px;
-}
+        .team-count-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: #333; /* Dark gray background */
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+        }
 
-.team-wins,
-.team-points {
-    text-align: center;
-    font-size: 16px;
-    color: #f0f0f0; /* Light gray text color */
-}
+        .team-wins,
+        .team-points {
+            text-align: center;
+            font-size: 16px;
+            color: #f0f0f0; /* Light gray text color */
+        }
 
-.team-label {
-    margin: 0;
-    font-weight: bold;
-}
+        .team-label {
+            margin: 0;
+            font-weight: bold;
+        }
 
-.team-count {
-    margin: 0;
-    font-size: 18px;
-}
+        .team-count {
+            margin: 0;
+            font-size: 18px;
+        }
 
-.centered-heading {
-    text-align: center;
-    margin-top: 2%;
-    font-family: 'Poppins', sans-serif;
-}
-
+        .centered-heading {
+            text-align: center;
+            margin-top: 2%;
+            font-family: 'Poppins', sans-serif;
+        }
     </style>
 </head>
 <body>
@@ -138,7 +137,7 @@ tr:hover {
         <p class="team-count">{{ team1_wins }}</p>
     </div>
     <div class="team-wins">
-        <p class="team-label"><strong>GEACI:</strong></p>
+        <p class="team-label"><strong>GEJACI:</strong></p>
         <p class="team-count">{{ team2_wins }}</p>
     </div>
 </div>
@@ -149,11 +148,10 @@ tr:hover {
         <p class="team-count">{{ team1_points }}</p>
     </div>
     <div class="team-points">
-        <p class="team-label"><strong>GEACI:</strong></p>
+        <p class="team-label"><strong>GEJACI:</strong></p>
         <p class="team-count">{{ team2_points }}</p>
     </div>
 </div>
-
         <h2 class="centered-heading">Team Scores</h2>
         <table>
             <tr>
@@ -165,7 +163,7 @@ tr:hover {
                 <th>ValjevoJeSvetoMesto</th>
                 <th>mixXx</th>
                 <th>SAVEZNICI</th>
-                <th>GEACI</th>
+                <th>GEJACI</th>
             </tr>
             {% for week in range(1, 39) %}
                 <tr>
@@ -185,6 +183,5 @@ tr:hover {
                 </tr>
             {% endfor %}
         </table>
-
 </body>
 </html>

@@ -34,7 +34,7 @@ def calculate_team_wins(team1_sums, team2_sums):
     team2_wins = 0
 
     for week, team1_sum in team1_sums.items():
-        team2_sum = team2_sums.get(week, 0)  # Get the sum for team2 for the same week, default to 0 if not available
+        team2_sum = team2_sums.get(week, 0)
         if team1_sum > team2_sum:
             team1_wins += 1
         elif team2_sum > team1_sum:
@@ -47,12 +47,10 @@ def fetch_historical_data(entry_ids):
     all_historical_data = []
 
     for entry_id in entry_ids:
-        # Make API request to fetch historical data for the given entry
         url = "https://fantasy.premierleague.com/api/entry/" + str(entry_id) + "/history/"
         response = requests.get(url)
         data = response.json()
 
-        # Process the data and extract scores for each week in current season
         current_data = data["current"]
         total_scores_by_week = {entry["event"]: entry["total_points"] for entry in current_data}
 
