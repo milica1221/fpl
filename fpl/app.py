@@ -48,7 +48,7 @@ def fetch_historical_data(entry_ids):
 
     for entry_id in entry_ids:
         # Make API request to fetch historical data for the given entry
-        url = f"https://fantasy.premierleague.com/api/entry/{entry_id}/history/"
+        url = "https://fantasy.premierleague.com/api/entry/" + str(entry_id) + "/history/"
         response = requests.get(url)
         data = response.json()
 
