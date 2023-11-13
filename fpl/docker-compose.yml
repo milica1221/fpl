@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  web:
+    container_name: mel-fpl
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app

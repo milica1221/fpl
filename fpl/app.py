@@ -52,7 +52,7 @@ def fetch_historical_data(entry_ids):
         data = response.json()
 
         current_data = data["current"]
-        total_scores_by_week = {entry["event"]: entry["total_points"] for entry in current_data}
+        total_scores_by_week = {entry["event"]: (entry["points"]-entry["event_transfers_cost"]) for entry in current_data}
 
         all_historical_data.append({
             "entry_id": entry_id,
@@ -77,4 +77,4 @@ def calculate_team_sums(team_scores):
     return team_sums
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
