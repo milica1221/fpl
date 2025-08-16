@@ -469,6 +469,7 @@ def index():
                            league_name=league_name,
                            league_live_data=league_live_data,
                            colored_teams=["Sport bar 22", "NEPOBEDIVI", "Hell Patrol", "ValjevoJeSvetoMesto", "grmilica", "mixXx007"],
+                           our_team_ids=[4909598, 4658819, 3070732, 2227937, 4895434, 729967],  # Our 6 players for glowing effect
                            fast_mode=True)
 
     # Normal mode - full data loading (currently not used for performance)
@@ -542,7 +543,7 @@ def index():
                 })
     
     # Sort league data by fresh total season points
-    league_live_data.sort(key=lambda x: x["total_season_points"], reverse=True)
+    league_live_data.sort(key=lambda x: x["live_points"], reverse=True)
 
     # Fetch historical data (for previous weeks) with live data for current week
     team1_scores = fetch_historical_data(team1_entry_ids, current_event, player_names)
@@ -571,7 +572,7 @@ def index():
 
     # Add season total points to ALL data and sort by total points (only if needed)
     if has_current_data:
-        # Process team1_analytics data (Detalji tab - SORT BY SEASON TOTALS)
+        # Process team1_analytics data (Detalji tab - SORT BY LIVE POINTS)
         if team1_analytics:
             for i, analytics_data in enumerate(team1_analytics):
                 if i < len(team1_scores):
@@ -579,10 +580,10 @@ def index():
                     analytics_data['season_total_points'] = season_total
                 else:
                     analytics_data['season_total_points'] = 0
-            # Sort team1_analytics by season total points (highest first)
-            team1_analytics.sort(key=lambda x: x.get('season_total_points', 0), reverse=True)
+            # Sort team1_analytics by live points (highest first) - total_points is the live gameweek score
+            team1_analytics.sort(key=lambda x: x.get('total_points', 0), reverse=True)
         
-        # Process team2_analytics data (Detalji tab - SORT BY SEASON TOTALS)
+        # Process team2_analytics data (Detalji tab - SORT BY LIVE POINTS)
         if team2_analytics:
             for i, analytics_data in enumerate(team2_analytics):
                 if i < len(team2_scores):
@@ -590,8 +591,8 @@ def index():
                     analytics_data['season_total_points'] = season_total
                 else:
                     analytics_data['season_total_points'] = 0
-            # Sort team2_analytics by season total points (highest first)
-            team2_analytics.sort(key=lambda x: x.get('season_total_points', 0), reverse=True)
+            # Sort team2_analytics by live points (highest first) - total_points is the live gameweek score
+            team2_analytics.sort(key=lambda x: x.get('total_points', 0), reverse=True)
 
         # Add season totals to live data but DON'T SORT (keep original order for table display)
         if team1_live:
@@ -659,7 +660,8 @@ def index():
                            gw_status=gw_status_text,
                            league_name=league_name,
                            league_live_data=league_live_data,
-                           colored_teams=colored_teams)
+                           colored_teams=colored_teams,
+                           our_team_ids=[4909598, 4658819, 3070732, 2227937, 4895434, 729967])  # Our 6 players for glowing effect
 
 def calculate_team_wins(team1_sums, team2_sums):
     team1_wins = 0
@@ -1435,7 +1437,7 @@ def get_team_details(entry_id):
             
             player_info = {
                 "name": player_name,
-                "points": actual_points,
+                "points": points if multiplier == 0 else actual_points,  # Show base points for bench, actual points for starting XI
                 "multiplier": multiplier,
                 "is_captain": pick.get("is_captain", False),
                 "is_vice_captain": pick.get("is_vice_captain", False)

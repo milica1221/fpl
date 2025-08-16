@@ -878,6 +878,79 @@
             }
         }
 
+        /* Our team glowing effects - 6 different white/colorful shades - ENHANCED */
+        @keyframes our-team-glow-1 {
+            0% { box-shadow: 0 0 8px rgba(255, 255, 255, 0.6), inset 0 0 8px rgba(255, 255, 255, 0.1); }
+            50% { box-shadow: 0 0 25px rgba(255, 255, 255, 1), 0 0 35px rgba(255, 255, 255, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.2); }
+            100% { box-shadow: 0 0 8px rgba(255, 255, 255, 0.6), inset 0 0 8px rgba(255, 255, 255, 0.1); }
+        }
+
+        @keyframes our-team-glow-2 {
+            0% { box-shadow: 0 0 8px rgba(0, 255, 127, 0.6), inset 0 0 8px rgba(0, 255, 127, 0.1); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 127, 1), 0 0 35px rgba(0, 255, 127, 0.8), inset 0 0 15px rgba(0, 255, 127, 0.2); }
+            100% { box-shadow: 0 0 8px rgba(0, 255, 127, 0.6), inset 0 0 8px rgba(0, 255, 127, 0.1); }
+        }
+
+        @keyframes our-team-glow-3 {
+            0% { box-shadow: 0 0 8px rgba(255, 20, 147, 0.6), inset 0 0 8px rgba(255, 20, 147, 0.1); }
+            50% { box-shadow: 0 0 25px rgba(255, 20, 147, 1), 0 0 35px rgba(255, 20, 147, 0.8), inset 0 0 15px rgba(255, 20, 147, 0.2); }
+            100% { box-shadow: 0 0 8px rgba(255, 20, 147, 0.6), inset 0 0 8px rgba(255, 20, 147, 0.1); }
+        }
+
+        @keyframes our-team-glow-4 {
+            0% { box-shadow: 0 0 8px rgba(0, 191, 255, 0.6), inset 0 0 8px rgba(0, 191, 255, 0.1); }
+            50% { box-shadow: 0 0 25px rgba(0, 191, 255, 1), 0 0 35px rgba(0, 191, 255, 0.8), inset 0 0 15px rgba(0, 191, 255, 0.2); }
+            100% { box-shadow: 0 0 8px rgba(0, 191, 255, 0.6), inset 0 0 8px rgba(0, 191, 255, 0.1); }
+        }
+
+        @keyframes our-team-glow-5 {
+            0% { box-shadow: 0 0 8px rgba(255, 255, 0, 0.6), inset 0 0 8px rgba(255, 255, 0, 0.1); }
+            50% { box-shadow: 0 0 25px rgba(255, 255, 0, 1), 0 0 35px rgba(255, 255, 0, 0.8), inset 0 0 15px rgba(255, 255, 0, 0.2); }
+            100% { box-shadow: 0 0 8px rgba(255, 255, 0, 0.6), inset 0 0 8px rgba(255, 255, 0, 0.1); }
+        }
+
+        @keyframes our-team-glow-6 {
+            0% { box-shadow: 0 0 8px rgba(255, 165, 0, 0.6), inset 0 0 8px rgba(255, 165, 0, 0.1); }
+            50% { box-shadow: 0 0 25px rgba(255, 165, 0, 1), 0 0 35px rgba(255, 165, 0, 0.8), inset 0 0 15px rgba(255, 165, 0, 0.2); }
+            100% { box-shadow: 0 0 8px rgba(255, 165, 0, 0.6), inset 0 0 8px rgba(255, 165, 0, 0.1); }
+        }
+
+        .our-team-1 {
+            animation: our-team-glow-1 2s ease-in-out infinite alternate;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05)) !important;
+            border: 2px solid rgba(255, 255, 255, 0.4) !important;
+        }
+
+        .our-team-2 {
+            animation: our-team-glow-2 2s ease-in-out infinite alternate;
+            background: linear-gradient(135deg, rgba(0, 255, 127, 0.15), rgba(0, 255, 127, 0.05)) !important;
+            border: 2px solid rgba(0, 255, 127, 0.4) !important;
+        }
+
+        .our-team-3 {
+            animation: our-team-glow-3 2s ease-in-out infinite alternate;
+            background: linear-gradient(135deg, rgba(255, 20, 147, 0.15), rgba(255, 20, 147, 0.05)) !important;
+            border: 2px solid rgba(255, 20, 147, 0.4) !important;
+        }
+
+        .our-team-4 {
+            animation: our-team-glow-4 2s ease-in-out infinite alternate;
+            background: linear-gradient(135deg, rgba(0, 191, 255, 0.15), rgba(0, 191, 255, 0.05)) !important;
+            border: 2px solid rgba(0, 191, 255, 0.4) !important;
+        }
+
+        .our-team-5 {
+            animation: our-team-glow-5 2s ease-in-out infinite alternate;
+            background: linear-gradient(135deg, rgba(255, 255, 0, 0.15), rgba(255, 255, 0, 0.05)) !important;
+            border: 2px solid rgba(255, 255, 0, 0.4) !important;
+        }
+
+        .our-team-6 {
+            animation: our-team-glow-6 2s ease-in-out infinite alternate;
+            background: linear-gradient(135deg, rgba(255, 165, 0, 0.15), rgba(255, 165, 0, 0.05)) !important;
+            border: 2px solid rgba(255, 165, 0, 0.4) !important;
+        }
+
         .bench-player {
             border-left-color: #666;
             background: rgba(102, 102, 102, 0.1);
@@ -1632,19 +1705,26 @@
                         <th onclick="sortTable(0, 'league-table')" style="cursor: pointer;">Rank ⇅</th>
                         <th onclick="sortTable(1, 'league-table')" style="cursor: pointer;">Team ⇅</th>
                         <th onclick="sortTable(2, 'league-table')" style="cursor: pointer;">Manager ⇅</th>
-                        <th onclick="sortTable(3, 'league-table')" style="cursor: pointer;">Total Points ⇅</th>
-                        <th onclick="sortTable(4, 'league-table')" style="cursor: pointer;">GW{{ display_event }} ⇅</th>
-                        <th onclick="sortTable(5, 'league-table')" style="cursor: pointer;">To Play ⇅</th>
-                        <th onclick="sortTable(6, 'league-table')" style="cursor: pointer;">Captain ⇅</th>
+                        <th onclick="sortTable(3, 'league-table')" style="cursor: pointer;">GW{{ display_event }} ⇅</th>
+                        <th onclick="sortTable(4, 'league-table')" style="cursor: pointer;">To Play ⇅</th>
+                        <th onclick="sortTable(5, 'league-table')" style="cursor: pointer;">Captain ⇅</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for entry in league_live_data %}
-                    <tr data-team-name="{{ entry.entry_name }}" data-player-name="{{ entry.player_name }}" {% if entry.entry_name in colored_teams or entry.player_name in colored_teams %}class="colored-team"{% endif %}>
+                    <tr data-team-name="{{ entry.entry_name }}" data-player-name="{{ entry.player_name }}" 
+                        {% set our_classes = [] %}
+                        {% if entry.entry_name in colored_teams or entry.player_name in colored_teams %}
+                            {% set _ = our_classes.append("colored-team") %}
+                        {% endif %}
+                        {% if entry.entry_id in our_team_ids %}
+                            {% set our_index = our_team_ids.index(entry.entry_id) + 1 %}
+                            {% set _ = our_classes.append("our-team-" ~ our_index) %}
+                        {% endif %}
+                        {% if our_classes %}class="{{ our_classes|join(' ') }}"{% endif %}>
                         <td>{{ loop.index }}</td>
                         <td>{{ entry.entry_name }}</td>
                         <td>{{ entry.player_name }}</td>
-                        <td>{{ entry.total_season_points }}</td>
                         <td>{{ entry.live_points }}</td>
                         <td>
                             {% if entry.players_to_play_count > 0 %}
