@@ -1,8 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="sr">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FPL Kalkulator - Fantasy Premier League analiza i statistike">
+    <meta name="robots" content="noindex, nofollow">
     <title>FPL Kalkulator</title>
-     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap"></noscript>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -12,9 +17,109 @@
             color: #f0f0f0;
         }
 
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 26, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Glowing loading spinner */
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(255, 140, 0, 0.2);
+            border-radius: 50%;
+            border-top: 4px solid #FF8C00;
+            animation: spin 1s linear infinite, glow-pulse 2s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { 
+                box-shadow: 0 0 20px #FF8C00, 0 0 40px #FF8C00, 0 0 60px #FF8C00;
+                border-top-color: #FF8C00;
+            }
+            25% { 
+                box-shadow: 0 0 20px #00FF85, 0 0 40px #00FF85, 0 0 60px #00FF85;
+                border-top-color: #00FF85;
+            }
+            50% { 
+                box-shadow: 0 0 20px #E90052, 0 0 40px #E90052, 0 0 60px #E90052;
+                border-top-color: #E90052;
+            }
+            75% { 
+                box-shadow: 0 0 20px #FFD700, 0 0 40px #FFD700, 0 0 60px #FFD700;
+                border-top-color: #FFD700;
+            }
+        }
+
+        /* Loading text */
+        .loading-text {
+            color: #FF8C00;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            animation: text-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes text-glow {
+            0%, 100% { 
+                color: #FF8C00; 
+                text-shadow: 0 0 10px #FF8C00;
+            }
+            25% { 
+                color: #00FF85; 
+                text-shadow: 0 0 10px #00FF85;
+            }
+            50% { 
+                color: #E90052; 
+                text-shadow: 0 0 10px #E90052;
+            }
+            75% { 
+                color: #FFD700; 
+                text-shadow: 0 0 10px #FFD700;
+            }
+        }
+
+        /* Loading dots animation */
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+
         h1 {
             text-align: center;
             margin-top: 30px;
+            color: #FFFFFF;
+            font-size: 2.5em;
+            font-weight: bold;
         }
 
         form {
@@ -84,10 +189,12 @@
 
         .win-cell {
             background-color: #00FF85; /* Neon green for winning team */
+            color: #000000; /* Black text for green background */
         }
 
         .lose-cell {
             background-color: #E90052; /* Neon red for losing team */
+            color: #FFFFFF; /* White text for red background */
         }
 
         .tie-cell {
@@ -178,17 +285,6 @@
             animation-iteration-count: 1;
         }
 
-        .snowflake {
-            position: absolute;
-            color: #fff;
-            user-select: none;
-            pointer-events: none;
-            font-size: 14px;
-            animation-name: snowfall;
-            animation-timing-function: linear;
-            animation-iteration-count: 1;
-        }
-
         @keyframes fireworkExplode {
             0% {
                 transform: scale(0);
@@ -207,17 +303,6 @@
             }
             100% {
                 transform: translateY(100vh) translateX(-50px);
-                opacity: 0;
-            }
-        }
-
-        @keyframes snowfall {
-            0% {
-                transform: translateY(-100vh) translateX(0px) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) translateX(100px) rotate(360deg);
                 opacity: 0;
             }
         }
@@ -369,6 +454,28 @@
             transition: all 0.3s ease;
         }
 
+        .team-analytics-section:hover {
+            border-color: #32CD32;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5),
+                        0 0 25px rgba(50, 205, 50, 0.3),
+                        0 0 35px rgba(50, 205, 50, 0.2);
+            animation: team-glow 2.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes team-glow {
+            0% {
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5),
+                            0 0 25px rgba(50, 205, 50, 0.3),
+                            0 0 35px rgba(50, 205, 50, 0.2);
+            }
+            100% {
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5),
+                            0 0 30px rgba(50, 205, 50, 0.4),
+                            0 0 40px rgba(50, 205, 50, 0.3),
+                            0 0 50px rgba(50, 205, 50, 0.1);
+            }
+        }
+
         .team-header {
             text-align: center;
             margin-bottom: 25px;
@@ -402,12 +509,32 @@
             padding: 15px;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
             border-left: 4px solid #FF8C00;
-            transition: transform 0.2s ease;
+            border: 2px solid transparent;
+            transition: transform 0.2s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
         }
 
         .player-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            border-color: #FF8C00;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), 
+                        0 0 20px rgba(255, 140, 0, 0.3),
+                        0 0 30px rgba(255, 140, 0, 0.2);
+            animation: card-glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes card-glow {
+            0% {
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), 
+                            0 0 20px rgba(255, 140, 0, 0.3),
+                            0 0 30px rgba(255, 140, 0, 0.2);
+            }
+            100% {
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), 
+                            0 0 25px rgba(255, 140, 0, 0.4),
+                            0 0 35px rgba(255, 140, 0, 0.3),
+                            0 0 45px rgba(255, 140, 0, 0.1);
+            }
         }
 
         .player-header {
@@ -508,349 +635,35 @@
             font-weight: bold;
         }
 
+        /* Player actions styling */
+        .player-actions {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #444;
+            text-align: center;
+        }
+
+        .view-team-btn {
+            background: linear-gradient(135deg, #FF8C00, #FFA500);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(255, 140, 0, 0.3);
+        }
+
+        .view-team-btn:hover {
+            background: linear-gradient(135deg, #FFA500, #FFD700);
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(255, 140, 0, 0.4);
+        }
+
         /* Color classes for random team colors */
-        .color-red { background: linear-gradient(135deg, #FF6B6B, #FF8E85); border-color: #FF6B6B; }
-        .color-blue { background: linear-gradient(135deg, #4ECDC4, #6BCF7A); border-color: #4ECDC4; }
-        .color-purple { background: linear-gradient(135deg, #A8E6CF, #88D8A3); border-color: #A8E6CF; }
-        .color-orange { background: linear-gradient(135deg, #FFD93D, #FFED4A); border-color: #FFD93D; }
-        .color-pink { background: linear-gradient(135deg, #FF8A80, #FFAB91); border-color: #FF8A80; }
-        .color-teal { background: linear-gradient(135deg, #26D0CE, #1A2980); border-color: #26D0CE; }
-        
-        .color-crimson { background: linear-gradient(135deg, #DC143C, #FF6B6B); border-color: #DC143C; }
-        .color-navy { background: linear-gradient(135deg, #000080, #4169E1); border-color: #000080; }
-        .color-violet { background: linear-gradient(135deg, #8A2BE2, #9370DB); border-color: #8A2BE2; }
-        .color-amber { background: linear-gradient(135deg, #FFBF00, #FFD700); border-color: #FFBF00; }
-        .color-rose { background: linear-gradient(135deg, #FF007F, #FF69B4); border-color: #FF007F; }
-        .color-cyan { background: linear-gradient(135deg, #00FFFF, #40E0D0); border-color: #00FFFF; }
-        
-        .color-maroon { background: linear-gradient(135deg, #800000, #B22222); border-color: #800000; }
-        .color-royal { background: linear-gradient(135deg, #4169E1, #6495ED); border-color: #4169E1; }
-        .color-lavender { background: linear-gradient(135deg, #E6E6FA, #DDA0DD); border-color: #E6E6FA; }
-        .color-gold { background: linear-gradient(135deg, #FFD700, #FFA500); border-color: #FFD700; }
-        .color-coral { background: linear-gradient(135deg, #FF7F50, #FF6347); border-color: #FF7F50; }
-        .color-turquoise { background: linear-gradient(135deg, #40E0D0, #48D1CC); border-color: #40E0D0; }
-        
-        .color-burgundy { background: linear-gradient(135deg, #722F37, #8B0000); border-color: #722F37; }
-        .color-sapphire { background: linear-gradient(135deg, #0F52BA, #0066CC); border-color: #0F52BA; }
-        .color-magenta { background: linear-gradient(135deg, #FF00FF, #DA70D6); border-color: #FF00FF; }
-        .color-bronze { background: linear-gradient(135deg, #CD7F32, #B87333); border-color: #CD7F32; }
-        .color-salmon { background: linear-gradient(135deg, #FA8072, #FF7F7F); border-color: #FA8072; }
-        .color-aqua { background: linear-gradient(135deg, #00FFFF, #7FFFD4); border-color: #00FFFF; }
-        
-        .color-wine { background: linear-gradient(135deg, #722F37, #8B2635); border-color: #722F37; }
-        .color-indigo { background: linear-gradient(135deg, #4B0082, #6A0DAD); border-color: #4B0082; }
-        .color-plum { background: linear-gradient(135deg, #DDA0DD, #8B008B); border-color: #DDA0DD; }
-        .color-honey { background: linear-gradient(135deg, #FFC30B, #FFD700); border-color: #FFC30B; }
-        .color-peach { background: linear-gradient(135deg, #FFCBA4, #FFE5B4); border-color: #FFCBA4; }
-        .color-mint { background: linear-gradient(135deg, #98FB98, #00FA9A); border-color: #98FB98; }
-        
-        .color-scarlet { background: linear-gradient(135deg, #FF2400, #FF6347); border-color: #FF2400; }
-        .color-cobalt { background: linear-gradient(135deg, #0047AB, #4682B4); border-color: #0047AB; }
-        .color-orchid { background: linear-gradient(135deg, #DA70D6, #BA55D3); border-color: #DA70D6; }
-        .color-copper { background: linear-gradient(135deg, #B87333, #CD853F); border-color: #B87333; }
-        .color-blush { background: linear-gradient(135deg, #DE5D83, #FF91A4); border-color: #DE5D83; }
-        .color-seafoam { background: linear-gradient(135deg, #93E9BE, #2E8B57); border-color: #93E9BE; }
-        
-        .color-ruby { background: linear-gradient(135deg, #E0115F, #FF1493); border-color: #E0115F; }
-        .color-steel { background: linear-gradient(135deg, #4682B4, #708090); border-color: #4682B4; }
-        .color-lilac { background: linear-gradient(135deg, #C8A2C8, #DDA0DD); border-color: #C8A2C8; }
-        .color-caramel { background: linear-gradient(135deg, #AF6E4D, #D2691E); border-color: #AF6E4D; }
-        .color-flamingo { background: linear-gradient(135deg, #FC8EAC, #FF69B4); border-color: #FC8EAC; }
-        .color-jade { background: linear-gradient(135deg, #00A86B, #50C878); border-color: #00A86B; }
-        
-        .color-cherry { background: linear-gradient(135deg, #DE3163, #FF1493); border-color: #DE3163; }
-        .color-slate { background: linear-gradient(135deg, #708090, #2F4F4F); border-color: #708090; }
-        .color-thistle { background: linear-gradient(135deg, #D8BFD8, #DDA0DD); border-color: #D8BFD8; }
-        .color-butterscotch { background: linear-gradient(135deg, #E3963E, #DAA520); border-color: #E3963E; }
-        .color-hibiscus { background: linear-gradient(135deg, #B43757, #DC143C); border-color: #B43757; }
-        .color-emerald { background: linear-gradient(135deg, #50C878, #00FF7F); border-color: #50C878; }
-        
-        .color-cardinal { background: linear-gradient(135deg, #C41E3A, #B22222); border-color: #C41E3A; }
-        .color-charcoal { background: linear-gradient(135deg, #36454F, #2F4F4F); border-color: #36454F; }
-        .color-iris { background: linear-gradient(135deg, #5A4FCF, #9370DB); border-color: #5A4FCF; }
-        .color-topaz { background: linear-gradient(135deg, #FFC87C, #FFD700); border-color: #FFC87C; }
-        .color-fuchsia { background: linear-gradient(135deg, #FF00FF, #C71585); border-color: #FF00FF; }
-        .color-malachite { background: linear-gradient(135deg, #0BDA51, #32CD32); border-color: #0BDA51; }
-        
-        .color-vermillion { background: linear-gradient(135deg, #E34234, #FF4500); border-color: #E34234; }
-        .color-graphite { background: linear-gradient(135deg, #41424C, #36454F); border-color: #41424C; }
-        .color-wisteria { background: linear-gradient(135deg, #C9A0DC, #DDA0DD); border-color: #C9A0DC; }
-        .color-citrine { background: linear-gradient(135deg, #E4D00A, #FFD700); border-color: #E4D00A; }
-        .color-cerise { background: linear-gradient(135deg, #DE3163, #FF1493); border-color: #DE3163; }
-        .color-beryl { background: linear-gradient(135deg, #7DD3C0, #40E0D0); border-color: #7DD3C0; }
-        
-        .color-rust { background: linear-gradient(135deg, #B7410E, #CD853F); border-color: #B7410E; }
-        .color-midnight { background: linear-gradient(135deg, #191970, #000080); border-color: #191970; }
-        .color-periwinkle { background: linear-gradient(135deg, #CCCCFF, #9370DB); border-color: #CCCCFF; }
-        .color-amber-dark { background: linear-gradient(135deg, #FF8000, #FFA500); border-color: #FF8000; }
-        .color-hot-pink { background: linear-gradient(135deg, #FF69B4, #FF1493); border-color: #FF69B4; }
-        .color-viridian { background: linear-gradient(135deg, #40826D, #2E8B57); border-color: #40826D; }
-        
-        .color-brick { background: linear-gradient(135deg, #CB4154, #B22222); border-color: #CB4154; }
-        .color-charcoal-blue { background: linear-gradient(135deg, #36454F, #4682B4); border-color: #36454F; }
-        .color-heliotrope { background: linear-gradient(135deg, #DF73FF, #DA70D6); border-color: #DF73FF; }
-        .color-saffron { background: linear-gradient(135deg, #F4C430, #FFD700); border-color: #F4C430; }
-        .color-magenta-bright { background: linear-gradient(135deg, #FF0090, #FF69B4); border-color: #FF0090; }
-        .color-forest { background: linear-gradient(135deg, #228B22, #32CD32); border-color: #228B22; }
-        
-        .color-terracotta { background: linear-gradient(135deg, #E2725B, #CD853F); border-color: #E2725B; }
-        .color-prussian { background: linear-gradient(135deg, #003153, #4682B4); border-color: #003153; }
-        .color-amethyst { background: linear-gradient(135deg, #9966CC, #8A2BE2); border-color: #9966CC; }
-        .color-mustard { background: linear-gradient(135deg, #FFDB58, #DAA520); border-color: #FFDB58; }
-        .color-raspberry { background: linear-gradient(135deg, #E30B5C, #FF1493); border-color: #E30B5C; }
-        .color-pine { background: linear-gradient(135deg, #01796F, #2E8B57); border-color: #01796F; }
-        
-        .color-mahogany { background: linear-gradient(135deg, #C04000, #8B4513); border-color: #C04000; }
-        .color-cerulean { background: linear-gradient(135deg, #007BA7, #4682B4); border-color: #007BA7; }
-        .color-violet-red { background: linear-gradient(135deg, #F75394, #FF1493); border-color: #F75394; }
-        .color-ochre { background: linear-gradient(135deg, #CC7722, #DAA520); border-color: #CC7722; }
-        .color-strawberry { background: linear-gradient(135deg, #FC5A8D, #FF69B4); border-color: #FC5A8D; }
-        .color-olive { background: linear-gradient(135deg, #808000, #9ACD32); border-color: #808000; }
-        
-        .color-chestnut { background: linear-gradient(135deg, #954535, #8B4513); border-color: #954535; }
-        .color-azure { background: linear-gradient(135deg, #007FFF, #4682B4); border-color: #007FFF; }
-        .color-mauve { background: linear-gradient(135deg, #E0B0FF, #DDA0DD); border-color: #E0B0FF; }
-        .color-tangerine { background: linear-gradient(135deg, #F28500, #FFA500); border-color: #F28500; }
-        .color-watermelon { background: linear-gradient(135deg, #FF91A4, #FF69B4); border-color: #FF91A4; }
-        .color-sage { background: linear-gradient(135deg, #9CAF88, #8FBC8F); border-color: #9CAF88; }
-        
-        .color-sienna { background: linear-gradient(135deg, #A0522D, #8B4513); border-color: #A0522D; }
-        .color-powder-blue { background: linear-gradient(135deg, #B0E0E6, #87CEEB); border-color: #B0E0E6; }
-        .color-purple-deep { background: linear-gradient(135deg, #663399, #8A2BE2); border-color: #663399; }
-        .color-apricot { background: linear-gradient(135deg, #FBCEB1, #FFCBA4); border-color: #FBCEB1; }
-        .color-bubblegum { background: linear-gradient(135deg, #FFC1CC, #FF69B4); border-color: #FFC1CC; }
-        .color-eucalyptus { background: linear-gradient(135deg, #44D7A8, #2E8B57); border-color: #44D7A8; }
-        
-        .color-umber { background: linear-gradient(135deg, #635147, #8B4513); border-color: #635147; }
-        .color-sky-blue { background: linear-gradient(135deg, #87CEEB, #4682B4); border-color: #87CEEB; }
-        .color-grape { background: linear-gradient(135deg, #6F2DA8, #8A2BE2); border-color: #6F2DA8; }
-        .color-peach-deep { background: linear-gradient(135deg, #FFCBA4, #CD853F); border-color: #FFCBA4; }
-        .color-cotton-candy { background: linear-gradient(135deg, #FFBCD9, #FF69B4); border-color: #FFBCD9; }
-        .color-moss { background: linear-gradient(135deg, #ADDFAD, #2E8B57); border-color: #ADDFAD; }
-        
-        .color-rust-red { background: linear-gradient(135deg, #DA2C43, #B22222); border-color: #DA2C43; }
-        .color-baby-blue { background: linear-gradient(135deg, #89CFF0, #87CEEB); border-color: #89CFF0; }
-        .color-blackberry { background: linear-gradient(135deg, #8F5973, #8B008B); border-color: #8F5973; }
-        .color-mango { background: linear-gradient(135deg, #FDBE02, #FFA500); border-color: #FDBE02; }
-        .color-rose-gold { background: linear-gradient(135deg, #E8B4B8, #FF69B4); border-color: #E8B4B8; }
-        .color-lime { background: linear-gradient(135deg, #32CD32, #00FF00); border-color: #32CD32; }
-        
-        .color-burnt-orange { background: linear-gradient(135deg, #CC5500, #FF4500); border-color: #CC5500; }
-        .color-ice-blue { background: linear-gradient(135deg, #99D9EA, #87CEEB); border-color: #99D9EA; }
-        .color-eggplant { background: linear-gradient(135deg, #614051, #8B008B); border-color: #614051; }
-        .color-papaya { background: linear-gradient(135deg, #FFEFD5, #FFCBA4); border-color: #FFEFD5; }
-        .color-blush-pink { background: linear-gradient(135deg, #FE828C, #FF69B4); border-color: #FE828C; }
-        .color-chartreuse { background: linear-gradient(135deg, #DFFF00, #32CD32); border-color: #DFFF00; }
-        
-        .color-cinnamon { background: linear-gradient(135deg, #D2691E, #CD853F); border-color: #D2691E; }
-        .color-arctic-blue { background: linear-gradient(135deg, #1B9AAA, #4682B4); border-color: #1B9AAA; }
-        .color-boysenberry { background: linear-gradient(135deg, #873260, #8B008B); border-color: #873260; }
-        .color-cantaloupe { background: linear-gradient(135deg, #FFA366, #FFCBA4); border-color: #FFA366; }
-        .color-dusty-rose { background: linear-gradient(135deg, #DCAE96, #FF69B4); border-color: #DCAE96; }
-        .color-spring-green { background: linear-gradient(135deg, #00FF7F, #32CD32); border-color: #00FF7F; }
-        
-        .color-paprika { background: linear-gradient(135deg, #CC5500, #FF4500); border-color: #CC5500; }
-        .color-ocean-blue { background: linear-gradient(135deg, #006994, #4682B4); border-color: #006994; }
-        .color-mulberry { background: linear-gradient(135deg, #C54B8C, #8B008B); border-color: #C54B8C; }
-        .color-persimmon { background: linear-gradient(135deg, #EC5800, #FF4500); border-color: #EC5800; }
-        .color-mauve-pink { background: linear-gradient(135deg, #F49AC2, #FF69B4); border-color: #F49AC2; }
-        .color-kelly-green { background: linear-gradient(135deg, #4CBB17, #32CD32); border-color: #4CBB17; }
-
-        /* Table row color styling for league tab */
-        tr.color-red, tr.color-crimson, tr.color-maroon, tr.color-burgundy, tr.color-wine, tr.color-scarlet,
-        tr.color-ruby, tr.color-cherry, tr.color-cardinal, tr.color-hibiscus, tr.color-vermillion, tr.color-cerise,
-        tr.color-rust, tr.color-brick, tr.color-terracotta, tr.color-mahogany, tr.color-chestnut, tr.color-sienna,
-        tr.color-umber, tr.color-rust-red, tr.color-paprika, tr.color-burnt-orange, tr.color-cinnamon {
-            color: white !important;
-        }
-        
-        tr.color-blue, tr.color-navy, tr.color-royal, tr.color-sapphire, tr.color-indigo, tr.color-cobalt,
-        tr.color-steel, tr.color-slate, tr.color-charcoal, tr.color-graphite, tr.color-midnight, tr.color-charcoal-blue,
-        tr.color-prussian, tr.color-cerulean, tr.color-azure, tr.color-ocean-blue, tr.color-arctic-blue {
-            color: white !important;
-        }
-        
-        tr.color-purple, tr.color-violet, tr.color-lavender, tr.color-plum, tr.color-orchid, tr.color-lilac,
-        tr.color-thistle, tr.color-iris, tr.color-wisteria, tr.color-heliotrope, tr.color-amethyst, tr.color-violet-red,
-        tr.color-mauve, tr.color-purple-deep, tr.color-grape, tr.color-blackberry, tr.color-eggplant, tr.color-boysenberry,
-        tr.color-mulberry { 
-            color: white !important;
-        }
-
-        tr.color-orange, tr.color-amber, tr.color-gold, tr.color-bronze, tr.color-honey, tr.color-copper,
-        tr.color-caramel, tr.color-butterscotch, tr.color-topaz, tr.color-citrine, tr.color-amber-dark, tr.color-saffron,
-        tr.color-mustard, tr.color-ochre, tr.color-tangerine, tr.color-apricot, tr.color-peach-deep, tr.color-mango,
-        tr.color-papaya, tr.color-cantaloupe, tr.color-persimmon {
-            color: black !important;
-        }
-
-        tr.color-pink, tr.color-rose, tr.color-coral, tr.color-salmon, tr.color-blush, tr.color-flamingo,
-        tr.color-hot-pink, tr.color-magenta, tr.color-magenta-bright, tr.color-fuchsia, tr.color-raspberry,
-        tr.color-strawberry, tr.color-watermelon, tr.color-bubblegum, tr.color-cotton-candy, tr.color-rose-gold,
-        tr.color-blush-pink, tr.color-mauve-pink, tr.color-dusty-rose {
-            color: black !important;
-        }
-
-        tr.color-teal, tr.color-cyan, tr.color-turquoise, tr.color-aqua, tr.color-mint, tr.color-seafoam,
-        tr.color-jade, tr.color-emerald, tr.color-malachite, tr.color-viridian, tr.color-forest, tr.color-pine,
-        tr.color-olive, tr.color-sage, tr.color-eucalyptus, tr.color-moss, tr.color-lime, tr.color-chartreuse,
-        tr.color-spring-green, tr.color-kelly-green {
-            color: black !important;
-        }
-
-        tr.color-peach, tr.color-powder-blue, tr.color-sky-blue, tr.color-baby-blue, tr.color-ice-blue {
-            color: black !important;
-        }
-
-        /* Apply background colors to table rows */
-        tr.color-red { background: linear-gradient(135deg, #FF6B6B, #FF8E85) !important; }
-        tr.color-blue { background: linear-gradient(135deg, #4ECDC4, #6BCF7A) !important; }
-        tr.color-purple { background: linear-gradient(135deg, #A8E6CF, #88D8A3) !important; }
-        tr.color-orange { background: linear-gradient(135deg, #FFD93D, #FFED4A) !important; }
-        tr.color-pink { background: linear-gradient(135deg, #FF8A80, #FFAB91) !important; }
-        tr.color-teal { background: linear-gradient(135deg, #26D0CE, #1A2980) !important; }
-        
-        tr.color-crimson { background: linear-gradient(135deg, #DC143C, #FF6B6B) !important; }
-        tr.color-navy { background: linear-gradient(135deg, #000080, #4169E1) !important; }
-        tr.color-violet { background: linear-gradient(135deg, #8A2BE2, #9370DB) !important; }
-        tr.color-amber { background: linear-gradient(135deg, #FFBF00, #FFD700) !important; }
-        tr.color-rose { background: linear-gradient(135deg, #FF007F, #FF69B4) !important; }
-        tr.color-cyan { background: linear-gradient(135deg, #00FFFF, #40E0D0) !important; }
-        
-        tr.color-maroon { background: linear-gradient(135deg, #800000, #B22222) !important; }
-        tr.color-royal { background: linear-gradient(135deg, #4169E1, #6495ED) !important; }
-        tr.color-lavender { background: linear-gradient(135deg, #E6E6FA, #DDA0DD) !important; }
-        tr.color-gold { background: linear-gradient(135deg, #FFD700, #FFA500) !important; }
-        tr.color-coral { background: linear-gradient(135deg, #FF7F50, #FF6347) !important; }
-        tr.color-turquoise { background: linear-gradient(135deg, #40E0D0, #48D1CC) !important; }
-        
-        tr.color-burgundy { background: linear-gradient(135deg, #722F37, #8B0000) !important; }
-        tr.color-sapphire { background: linear-gradient(135deg, #0F52BA, #0066CC) !important; }
-        tr.color-magenta { background: linear-gradient(135deg, #FF00FF, #DA70D6) !important; }
-        tr.color-bronze { background: linear-gradient(135deg, #CD7F32, #B87333) !important; }
-        tr.color-salmon { background: linear-gradient(135deg, #FA8072, #FF7F7F) !important; }
-        tr.color-aqua { background: linear-gradient(135deg, #00FFFF, #7FFFD4) !important; }
-        
-        tr.color-wine { background: linear-gradient(135deg, #722F37, #8B2635) !important; }
-        tr.color-indigo { background: linear-gradient(135deg, #4B0082, #6A0DAD) !important; }
-        tr.color-plum { background: linear-gradient(135deg, #DDA0DD, #8B008B) !important; }
-        tr.color-honey { background: linear-gradient(135deg, #FFC30B, #FFD700) !important; }
-        tr.color-peach { background: linear-gradient(135deg, #FFCBA4, #FFE5B4) !important; }
-        tr.color-mint { background: linear-gradient(135deg, #98FB98, #00FA9A) !important; }
-        
-        tr.color-scarlet { background: linear-gradient(135deg, #FF2400, #FF6347) !important; }
-        tr.color-cobalt { background: linear-gradient(135deg, #0047AB, #4682B4) !important; }
-        tr.color-orchid { background: linear-gradient(135deg, #DA70D6, #BA55D3) !important; }
-        tr.color-copper { background: linear-gradient(135deg, #B87333, #CD853F) !important; }
-        tr.color-blush { background: linear-gradient(135deg, #DE5D83, #FF91A4) !important; }
-        tr.color-seafoam { background: linear-gradient(135deg, #93E9BE, #2E8B57) !important; }
-        
-        tr.color-ruby { background: linear-gradient(135deg, #E0115F, #FF1493) !important; }
-        tr.color-steel { background: linear-gradient(135deg, #4682B4, #708090) !important; }
-        tr.color-lilac { background: linear-gradient(135deg, #C8A2C8, #DDA0DD) !important; }
-        tr.color-caramel { background: linear-gradient(135deg, #AF6E4D, #D2691E) !important; }
-        tr.color-flamingo { background: linear-gradient(135deg, #FC8EAC, #FF69B4) !important; }
-        tr.color-jade { background: linear-gradient(135deg, #00A86B, #50C878) !important; }
-        
-        tr.color-cherry { background: linear-gradient(135deg, #DE3163, #FF1493) !important; }
-        tr.color-slate { background: linear-gradient(135deg, #708090, #2F4F4F) !important; }
-        tr.color-thistle { background: linear-gradient(135deg, #D8BFD8, #DDA0DD) !important; }
-        tr.color-butterscotch { background: linear-gradient(135deg, #E3963E, #DAA520) !important; }
-        tr.color-hibiscus { background: linear-gradient(135deg, #B43757, #DC143C) !important; }
-        tr.color-emerald { background: linear-gradient(135deg, #50C878, #00FF7F) !important; }
-        
-        tr.color-cardinal { background: linear-gradient(135deg, #C41E3A, #B22222) !important; }
-        tr.color-charcoal { background: linear-gradient(135deg, #36454F, #2F4F4F) !important; }
-        tr.color-iris { background: linear-gradient(135deg, #5A4FCF, #9370DB) !important; }
-        tr.color-topaz { background: linear-gradient(135deg, #FFC87C, #FFD700) !important; }
-        tr.color-fuchsia { background: linear-gradient(135deg, #FF00FF, #C71585) !important; }
-        tr.color-malachite { background: linear-gradient(135deg, #0BDA51, #32CD32) !important; }
-        
-        tr.color-vermillion { background: linear-gradient(135deg, #E34234, #FF4500) !important; }
-        tr.color-graphite { background: linear-gradient(135deg, #41424C, #36454F) !important; }
-        tr.color-wisteria { background: linear-gradient(135deg, #C9A0DC, #DDA0DD) !important; }
-        tr.color-citrine { background: linear-gradient(135deg, #E4D00A, #FFD700) !important; }
-        tr.color-cerise { background: linear-gradient(135deg, #DE3163, #FF1493) !important; }
-        tr.color-beryl { background: linear-gradient(135deg, #7DD3C0, #40E0D0) !important; }
-        
-        tr.color-rust { background: linear-gradient(135deg, #B7410E, #CD853F) !important; }
-        tr.color-midnight { background: linear-gradient(135deg, #191970, #000080) !important; }
-        tr.color-periwinkle { background: linear-gradient(135deg, #CCCCFF, #9370DB) !important; }
-        tr.color-amber-dark { background: linear-gradient(135deg, #FF8000, #FFA500) !important; }
-        tr.color-hot-pink { background: linear-gradient(135deg, #FF69B4, #FF1493) !important; }
-        tr.color-viridian { background: linear-gradient(135deg, #40826D, #2E8B57) !important; }
-        
-        tr.color-brick { background: linear-gradient(135deg, #CB4154, #B22222) !important; }
-        tr.color-charcoal-blue { background: linear-gradient(135deg, #36454F, #4682B4) !important; }
-        tr.color-heliotrope { background: linear-gradient(135deg, #DF73FF, #DA70D6) !important; }
-        tr.color-saffron { background: linear-gradient(135deg, #F4C430, #FFD700) !important; }
-        tr.color-magenta-bright { background: linear-gradient(135deg, #FF0090, #FF69B4) !important; }
-        tr.color-forest { background: linear-gradient(135deg, #228B22, #32CD32) !important; }
-        
-        tr.color-terracotta { background: linear-gradient(135deg, #E2725B, #CD853F) !important; }
-        tr.color-prussian { background: linear-gradient(135deg, #003153, #4682B4) !important; }
-        tr.color-amethyst { background: linear-gradient(135deg, #9966CC, #8A2BE2) !important; }
-        tr.color-mustard { background: linear-gradient(135deg, #FFDB58, #DAA520) !important; }
-        tr.color-raspberry { background: linear-gradient(135deg, #E30B5C, #FF1493) !important; }
-        tr.color-pine { background: linear-gradient(135deg, #01796F, #2E8B57) !important; }
-        
-        tr.color-mahogany { background: linear-gradient(135deg, #C04000, #8B4513) !important; }
-        tr.color-cerulean { background: linear-gradient(135deg, #007BA7, #4682B4) !important; }
-        tr.color-violet-red { background: linear-gradient(135deg, #F75394, #FF1493) !important; }
-        tr.color-ochre { background: linear-gradient(135deg, #CC7722, #DAA520) !important; }
-        tr.color-strawberry { background: linear-gradient(135deg, #FC5A8D, #FF69B4) !important; }
-        tr.color-olive { background: linear-gradient(135deg, #808000, #9ACD32) !important; }
-        
-        tr.color-chestnut { background: linear-gradient(135deg, #954535, #8B4513) !important; }
-        tr.color-azure { background: linear-gradient(135deg, #007FFF, #4682B4) !important; }
-        tr.color-mauve { background: linear-gradient(135deg, #E0B0FF, #DDA0DD) !important; }
-        tr.color-tangerine { background: linear-gradient(135deg, #F28500, #FFA500) !important; }
-        tr.color-watermelon { background: linear-gradient(135deg, #FF91A4, #FF69B4) !important; }
-        tr.color-sage { background: linear-gradient(135deg, #9CAF88, #8FBC8F) !important; }
-        
-        tr.color-sienna { background: linear-gradient(135deg, #A0522D, #8B4513) !important; }
-        tr.color-powder-blue { background: linear-gradient(135deg, #B0E0E6, #87CEEB) !important; }
-        tr.color-purple-deep { background: linear-gradient(135deg, #663399, #8A2BE2) !important; }
-        tr.color-apricot { background: linear-gradient(135deg, #FBCEB1, #FFCBA4) !important; }
-        tr.color-bubblegum { background: linear-gradient(135deg, #FFC1CC, #FF69B4) !important; }
-        tr.color-eucalyptus { background: linear-gradient(135deg, #44D7A8, #2E8B57) !important; }
-        
-        tr.color-umber { background: linear-gradient(135deg, #635147, #8B4513) !important; }
-        tr.color-sky-blue { background: linear-gradient(135deg, #87CEEB, #4682B4) !important; }
-        tr.color-grape { background: linear-gradient(135deg, #6F2DA8, #8A2BE2) !important; }
-        tr.color-peach-deep { background: linear-gradient(135deg, #FFCBA4, #CD853F) !important; }
-        tr.color-cotton-candy { background: linear-gradient(135deg, #FFBCD9, #FF69B4) !important; }
-        tr.color-moss { background: linear-gradient(135deg, #ADDFAD, #2E8B57) !important; }
-        
-        tr.color-rust-red { background: linear-gradient(135deg, #DA2C43, #B22222) !important; }
-        tr.color-baby-blue { background: linear-gradient(135deg, #89CFF0, #87CEEB) !important; }
-        tr.color-blackberry { background: linear-gradient(135deg, #8F5973, #8B008B) !important; }
-        tr.color-mango { background: linear-gradient(135deg, #FDBE02, #FFA500) !important; }
-        tr.color-rose-gold { background: linear-gradient(135deg, #E8B4B8, #FF69B4) !important; }
-        tr.color-lime { background: linear-gradient(135deg, #32CD32, #00FF00) !important; }
-        
-        tr.color-burnt-orange { background: linear-gradient(135deg, #CC5500, #FF4500) !important; }
-        tr.color-ice-blue { background: linear-gradient(135deg, #99D9EA, #87CEEB) !important; }
-        tr.color-eggplant { background: linear-gradient(135deg, #614051, #8B008B) !important; }
-        tr.color-papaya { background: linear-gradient(135deg, #FFEFD5, #FFCBA4) !important; }
-        tr.color-blush-pink { background: linear-gradient(135deg, #FE828C, #FF69B4) !important; }
-        tr.color-chartreuse { background: linear-gradient(135deg, #DFFF00, #32CD32) !important; }
-        
-        tr.color-cinnamon { background: linear-gradient(135deg, #D2691E, #CD853F) !important; }
-        tr.color-arctic-blue { background: linear-gradient(135deg, #1B9AAA, #4682B4) !important; }
-        tr.color-boysenberry { background: linear-gradient(135deg, #873260, #8B008B) !important; }
-        tr.color-cantaloupe { background: linear-gradient(135deg, #FFA366, #FFCBA4) !important; }
-        tr.color-dusty-rose { background: linear-gradient(135deg, #DCAE96, #FF69B4) !important; }
-        tr.color-spring-green { background: linear-gradient(135deg, #00FF7F, #32CD32) !important; }
-        
-        tr.color-paprika { background: linear-gradient(135deg, #CC5500, #FF4500) !important; }
-        tr.color-ocean-blue { background: linear-gradient(135deg, #006994, #4682B4) !important; }
-        tr.color-mulberry { background: linear-gradient(135deg, #C54B8C, #8B008B) !important; }
-        tr.color-persimmon { background: linear-gradient(135deg, #EC5800, #FF4500) !important; }
-        tr.color-mauve-pink { background: linear-gradient(135deg, #F49AC2, #FF69B4) !important; }
-        tr.color-kelly-green { background: linear-gradient(135deg, #4CBB17, #32CD32) !important; }
-
-        /* To Play button styling */
+        /* Color styles removed for cleaner UI design */        /* To Play button styling */
         .to-play-btn {
             background: linear-gradient(135deg, #FF8C00, #FFA500);
             border: none;
@@ -863,6 +676,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            animation: pulse-orange 2s infinite;
         }
 
         .to-play-btn:hover {
@@ -871,9 +685,272 @@
             box-shadow: 0 4px 8px rgba(255, 140, 0, 0.4);
         }
 
+        /* Live playing button - green with glowing effect */
+        .to-play-btn.live {
+            background: linear-gradient(135deg, #00FF85, #00D26A);
+            color: white;
+            animation: pulse-green 1.5s infinite;
+            box-shadow: 0 0 10px rgba(0, 255, 133, 0.5);
+        }
+
+        .to-play-btn.live:hover {
+            background: linear-gradient(135deg, #00D26A, #00C968);
+            box-shadow: 0 0 15px rgba(0, 255, 133, 0.7);
+        }
+
+        @keyframes pulse-orange {
+            0%, 100% {
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 140, 0, 0.6);
+            }
+        }
+
+        @keyframes pulse-green {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(0, 255, 133, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(0, 255, 133, 0.8), 0 0 30px rgba(0, 255, 133, 0.4);
+            }
+        }
+
         .no-players {
             color: #666;
             font-size: 14px;
+        }
+
+        /* Captain status styling */
+        .captain-played {
+            background-color: #00FF85;
+            color: #000000;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .captain-playing {
+            background-color: #FFD700;
+            color: #000000;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .captain-not-played {
+            background-color: #808080;
+            color: #FFFFFF;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .captain-unknown {
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* Team details modal styling */
+        .team-details-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .team-details-modal {
+            background: #1a1a1a;
+            border-radius: 12px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border: 2px solid #FF8C00;
+        }
+
+        .team-details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 2px solid #333;
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+        }
+
+        .team-details-header h2 {
+            margin: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .close-team-details {
+            background: #E90052;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-team-details:hover {
+            background: #ff1a5e;
+            transform: scale(1.1);
+        }
+
+        .team-details-content {
+            padding: 25px;
+        }
+
+        .team-section {
+            margin-bottom: 25px;
+        }
+
+        .team-section h3 {
+            color: #FF8C00;
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 8px;
+        }
+
+        .players-formation {
+            display: grid;
+            gap: 8px;
+        }
+
+        .players-formation.bench-players {
+            background: rgba(102, 102, 102, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #666;
+        }
+
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: #333;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .starting-player {
+            border-left-color: #00FF85;
+            background: rgba(0, 255, 133, 0.1);
+        }
+
+        /* Live playing player - bright green with glow */
+        .player-item.live-playing {
+            border-left-color: #00FF85;
+            background: linear-gradient(135deg, rgba(0, 255, 133, 0.2), rgba(0, 210, 106, 0.15));
+            box-shadow: inset 0 0 10px rgba(0, 255, 133, 0.3);
+            animation: glow-green 2s infinite alternate;
+        }
+
+        /* Waiting player - normal style */
+        .player-item.waiting {
+            border-left-color: #FFA500;
+            background: rgba(255, 165, 0, 0.1);
+        }
+
+        @keyframes glow-green {
+            0% {
+                box-shadow: inset 0 0 10px rgba(0, 255, 133, 0.3);
+            }
+            100% {
+                box-shadow: inset 0 0 15px rgba(0, 255, 133, 0.5), 0 0 5px rgba(0, 255, 133, 0.2);
+            }
+        }
+
+        .bench-player {
+            border-left-color: #666;
+            background: rgba(102, 102, 102, 0.1);
+        }
+
+        .player-name {
+            font-weight: 500;
+            color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .player-points {
+            font-weight: bold;
+            color: #FF8C00;
+        }
+
+        .captain-badge {
+            background: #FFD700;
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .vice-captain-badge {
+            background: #C0C0C0;
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .chip-info {
+            padding: 10px 15px;
+            background: rgba(255, 140, 0, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .chip-name {
+            color: #FF8C00;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .team-totals {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .total-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: #333;
+            border-radius: 8px;
+            border-left: 3px solid #FF8C00;
+        }
+
+        .total-label {
+            color: #ccc;
+            font-weight: 500;
+        }
+
+        .total-value {
+            color: #FF8C00;
+            font-weight: bold;
+            font-size: 16px;
         }
 
         /* Players popup styling */
@@ -977,26 +1054,265 @@
             transform: scale(1.05);
         }
 
-        /* Responsive design for smaller screens */
+        /* Basic mobile responsiveness */
         @media (max-width: 768px) {
-            .teams-analytics-container {
-                grid-template-columns: 1fr;
-                gap: 20px;
+            body {
+                padding: 10px;
+                font-size: 14px;
             }
-            
-            .team-header h2 {
-                font-size: 24px;
+
+            h1 {
+                font-size: 1.8em;
+                margin: 15px 0;
             }
-            
-            .team-stats-summary {
+
+            .tab {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+
+            /* Table mobile optimization */
+            table {
+                font-size: 12px;
+                width: 100%;
+                overflow-x: auto;
+                display: block;
+                white-space: nowrap;
+            }
+
+            thead, tbody {
+                display: block;
+            }
+
+            tr {
+                display: block;
+                margin-bottom: 1px;
+            }
+
+            th, td {
+                display: inline-block;
+                padding: 6px 4px;
+                text-align: center;
+                vertical-align: middle;
+                border: 1px solid #555;
+            }
+
+            /* League table specific mobile styling */
+            #league-table {
+                font-size: 13px;
+            }
+
+            #league-table tr {
+                min-height: 60px;
+                display: flex;
+                align-items: center;
+                margin-bottom: 2px;
+            }
+
+            #league-table th, 
+            #league-table td {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 8px 4px;
+                min-height: 50px;
+                border: 1px solid #555;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+
+            /* League table column widths for mobile */
+            #league-table th:nth-child(1), 
+            #league-table td:nth-child(1) { /* Rank */
+                flex: 0 0 50px;
+            }
+
+            #league-table th:nth-child(2), 
+            #league-table td:nth-child(2) { /* Team Name */
+                flex: 0 0 120px;
+                text-align: center;
+                line-height: 1.2;
+                white-space: normal;
+            }
+
+            #league-table th:nth-child(3), 
+            #league-table td:nth-child(3) { /* Manager */
+                flex: 0 0 100px;
+                text-align: center;
+                line-height: 1.2;
+                white-space: normal;
+                font-size: 11px;
+            }
+
+            #league-table th:nth-child(4), 
+            #league-table td:nth-child(4) { /* GW Points */
+                flex: 0 0 60px;
+            }
+
+            #league-table th:nth-child(5), 
+            #league-table td:nth-child(5) { /* To Play */
+                flex: 0 0 60px;
+            }
+
+            #league-table th:nth-child(6), 
+            #league-table td:nth-child(6) { /* Captain */
+                flex: 0 0 120px;
+                text-align: center;
+                line-height: 1.1;
+                white-space: normal;
+                font-size: 10px;
+            }
+
+            /* Basic column widths for other tables */
+            th:nth-child(1), td:nth-child(1) { width: 40px; }
+            th:nth-child(2), td:nth-child(2) { width: 60px; }
+            th:nth-child(3), td:nth-child(3) { width: 60px; }
+            th:nth-child(4), td:nth-child(4) { width: 70px; }
+            th:nth-child(5), td:nth-child(5) { width: 60px; }
+            th:nth-child(6), td:nth-child(6) { width: 80px; }
+            th:nth-child(7), td:nth-child(7) { width: 60px; }
+            th:nth-child(8), td:nth-child(8) { width: 70px; }
+            th:nth-child(9), td:nth-child(9) { width: 60px; }
+
+            /* Player cards mobile */
+            .player-card {
+                padding: 10px;
+                margin-bottom: 8px;
+            }
+
+            .player-header {
                 flex-direction: column;
                 gap: 5px;
                 text-align: center;
+            }
+
+            .player-header h3 {
+                font-size: 14px;
+            }
+
+            /* Teams layout mobile */
+            .teams-container {
+                gap: 10px;
+            }
+
+            .teams-analytics-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            /* Popup mobile */
+            .popup-content {
+                width: 95%;
+                margin: 20px auto;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 5px;
+                font-size: 12px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+                margin: 10px 0;
+            }
+
+            .tab {
+                font-size: 11px;
+                padding: 6px 8px;
+            }
+
+            table {
+                font-size: 10px;
+            }
+
+            th, td {
+                padding: 4px 2px;
+            }
+
+            /* Ultra mobile optimization for league table */
+            #league-table {
+                font-size: 11px;
+            }
+
+            #league-table tr {
+                min-height: 55px;
+            }
+
+            #league-table th, 
+            #league-table td {
+                min-height: 45px;
+                padding: 6px 2px;
+            }
+
+            /* Ultra small screen column widths */
+            #league-table th:nth-child(1), 
+            #league-table td:nth-child(1) { /* Rank */
+                flex: 0 0 40px;
+            }
+
+            #league-table th:nth-child(2), 
+            #league-table td:nth-child(2) { /* Team Name */
+                flex: 0 0 100px;
+                font-size: 10px;
+            }
+
+            #league-table th:nth-child(3), 
+            #league-table td:nth-child(3) { /* Manager */
+                flex: 0 0 80px;
+                font-size: 9px;
+            }
+
+            #league-table th:nth-child(4), 
+            #league-table td:nth-child(4) { /* GW Points */
+                flex: 0 0 50px;
+            }
+
+            #league-table th:nth-child(5), 
+            #league-table td:nth-child(5) { /* To Play */
+                flex: 0 0 50px;
+            }
+
+            #league-table th:nth-child(6), 
+            #league-table td:nth-child(6) { /* Captain */
+                flex: 0 0 100px;
+                font-size: 8px;
+            }
+
+            /* Smaller column widths for very small screens */
+            th:nth-child(1), td:nth-child(1) { width: 30px; }
+            th:nth-child(2), td:nth-child(2) { width: 45px; }
+            th:nth-child(3), td:nth-child(3) { width: 45px; }
+            th:nth-child(4), td:nth-child(4) { width: 50px; }
+            th:nth-child(5), td:nth-child(5) { width: 45px; }
+            th:nth-child(6), td:nth-child(6) { width: 60px; }
+            th:nth-child(7), td:nth-child(7) { width: 45px; }
+            th:nth-child(8), td:nth-child(8) { width: 55px; }
+            th:nth-child(9), td:nth-child(9) { width: 50px; }
+
+            .player-header h3 {
+                font-size: 12px;
+            }
+
+            .popup-content {
+                width: 98%;
+                margin: 10px auto;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Loading overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">
+            Učitavam FPL podatke<span class="loading-dots"></span>
+        </div>
+    </div>
+
     <!-- Dynamic Animation Container -->
     <div class="animation-container" id="animation-container"></div>
     
@@ -1194,6 +1510,14 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="player-actions">
+                            <button class="view-team-btn" 
+                                    data-entry-id="{{ player_analytics.entry_id if player_analytics else '' }}" 
+                                    data-player-name="{{ player_analytics.name if player_analytics else '' }}"
+                                    onclick="showTeamDetails(this)">
+                                Pogledaj tim
+                            </button>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
@@ -1278,6 +1602,14 @@
                             </div>
 
                         </div>
+                        <div class="player-actions">
+                            <button class="view-team-btn" 
+                                    data-entry-id="{{ player_analytics.entry_id if player_analytics else '' }}" 
+                                    data-player-name="{{ player_analytics.name if player_analytics else '' }}"
+                                    onclick="showTeamDetails(this)">
+                                Pogledaj tim
+                            </button>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
@@ -1297,12 +1629,13 @@
             <table id="league-table">
                 <thead>
                     <tr>
-                        <th onclick="sortTable(0, 'league-table')" style="cursor: pointer;">Rank</th>
-                        <th onclick="sortTable(1, 'league-table')" style="cursor: pointer;">Team Name</th>
-                        <th onclick="sortTable(2, 'league-table')" style="cursor: pointer;">Manager</th>
+                        <th onclick="sortTable(0, 'league-table')" style="cursor: pointer;">Rank ⇅</th>
+                        <th onclick="sortTable(1, 'league-table')" style="cursor: pointer;">Team ⇅</th>
+                        <th onclick="sortTable(2, 'league-table')" style="cursor: pointer;">Manager ⇅</th>
                         <th onclick="sortTable(3, 'league-table')" style="cursor: pointer;">Total Points ⇅</th>
-                        <th onclick="sortTable(4, 'league-table')" style="cursor: pointer;">GW{{ display_event }} Points ⇅</th>
+                        <th onclick="sortTable(4, 'league-table')" style="cursor: pointer;">GW{{ display_event }} ⇅</th>
                         <th onclick="sortTable(5, 'league-table')" style="cursor: pointer;">To Play ⇅</th>
+                        <th onclick="sortTable(6, 'league-table')" style="cursor: pointer;">Captain ⇅</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1315,15 +1648,30 @@
                         <td>{{ entry.live_points }}</td>
                         <td>
                             {% if entry.players_to_play_count > 0 %}
-                                <button class="to-play-btn" 
+                                <button class="to-play-btn{% if entry.has_live_players %} live{% endif %}" 
                                         data-entry-id="{{ entry.entry_id }}" 
                                         data-team-name="{{ entry.entry_name }}"
                                         data-players='{{ entry.players_to_play|tojson }}'
+                                        data-waiting='{{ entry.players_waiting|tojson }}'
+                                        data-playing='{{ entry.players_playing|tojson }}'
                                         onclick="showPlayersPopup(this)">
                                     {{ entry.players_to_play_count }}
                                 </button>
                             {% else %}
                                 <span class="no-players">0</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if entry.captain_info %}
+                                {% if entry.captain_info.played %}
+                                    <span class="captain-played">{{ entry.captain_info.name }}: {{ entry.captain_info.points }}</span>
+                                {% elif entry.captain_info.is_playing %}
+                                    <span class="captain-playing">{{ entry.captain_info.name }}: {{ entry.captain_info.points }}</span>
+                                {% else %}
+                                    <span class="captain-not-played">{{ entry.captain_info.name }}: 0</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="captain-unknown">N/A</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -1336,6 +1684,92 @@
     </div>
 
     <script>
+        // Loading management
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show loading on page refresh or initial load
+            showLoading();
+            
+            // Always start with preloading critical data
+            preloadCriticalData();
+            
+            // Hide loading when everything is loaded
+            window.addEventListener('load', function() {
+                hideLoading();
+            });
+            
+            // Show loading on tab changes that might trigger data fetch
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Small delay to show loading for tab changes
+                    showLoading();
+                    setTimeout(() => hideLoading(), 800);
+                });
+            });
+        });
+
+        function preloadCriticalData() {
+            // Preload player names and bootstrap data in background
+            // This helps speed up subsequent requests
+            fetch('/api/bootstrap-preload')
+                .then(response => response.json())
+                .catch(error => console.log('Preload completed (expected):', error));
+        }
+
+        function loadDataProgressively() {
+            // Progressive data loading for fast mode
+            setTimeout(() => {
+                fetch('/api/load-full-data')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Basic data loaded:', data);
+                        // Here you could update UI with basic data
+                        setTimeout(() => hideLoading(), 1000);
+                    })
+                    .catch(error => {
+                        console.error('Error loading data:', error);
+                        setTimeout(() => hideLoading(), 500);
+                    });
+            }, 500);
+        }
+
+        function showLoading() {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+                // Randomize loading text
+                const texts = [
+                    'Učitavam FPL podatke',
+                    'Kalkulišem poene',
+                    'Analiziram timove',
+                    'Sprovodim magiju',
+                    'Preuzimam najnovije rezultate',
+                    'Obrađujem podatke lige'
+                ];
+                const loadingText = overlay.querySelector('.loading-text');
+                if (loadingText) {
+                    const randomText = texts[Math.floor(Math.random() * texts.length)];
+                    loadingText.innerHTML = randomText + '<span class="loading-dots"></span>';
+                }
+            }
+        }
+
+        function hideLoading() {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) {
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // Show loading for AJAX requests
+        function showLoadingForRequest() {
+            showLoading();
+        }
+
+        function hideLoadingForRequest() {
+            hideLoading();
+        }
+
         function sortTable(columnIndex, tableId) {
             var table = document.getElementById(tableId);
             var tbody = table.querySelector('tbody');
@@ -1369,111 +1803,27 @@
             });
         }
         // Array of available colors for teams
-        const teamColors = [
-            'color-red', 'color-blue', 'color-purple', 'color-orange', 'color-pink', 'color-teal',
-            'color-crimson', 'color-navy', 'color-violet', 'color-amber', 'color-rose', 'color-cyan',
-            'color-maroon', 'color-royal', 'color-lavender', 'color-gold', 'color-coral', 'color-turquoise',
-            'color-burgundy', 'color-sapphire', 'color-magenta', 'color-bronze', 'color-salmon', 'color-aqua',
-            'color-wine', 'color-indigo', 'color-plum', 'color-honey', 'color-peach', 'color-mint',
-            'color-scarlet', 'color-cobalt', 'color-orchid', 'color-copper', 'color-blush', 'color-seafoam',
-            'color-ruby', 'color-steel', 'color-lilac', 'color-caramel', 'color-flamingo', 'color-jade',
-            'color-cherry', 'color-slate', 'color-thistle', 'color-butterscotch', 'color-hibiscus', 'color-emerald',
-            'color-cardinal', 'color-charcoal', 'color-iris', 'color-topaz', 'color-fuchsia', 'color-malachite',
-            'color-vermillion', 'color-graphite', 'color-wisteria', 'color-citrine', 'color-cerise', 'color-beryl',
-            'color-rust', 'color-midnight', 'color-periwinkle', 'color-amber-dark', 'color-hot-pink', 'color-viridian',
-            'color-brick', 'color-charcoal-blue', 'color-heliotrope', 'color-saffron', 'color-magenta-bright', 'color-forest',
-            'color-terracotta', 'color-prussian', 'color-amethyst', 'color-mustard', 'color-raspberry', 'color-pine',
-            'color-mahogany', 'color-cerulean', 'color-violet-red', 'color-ochre', 'color-strawberry', 'color-olive',
-            'color-chestnut', 'color-azure', 'color-mauve', 'color-tangerine', 'color-watermelon', 'color-sage',
-            'color-sienna', 'color-powder-blue', 'color-purple-deep', 'color-apricot', 'color-bubblegum', 'color-eucalyptus',
-            'color-umber', 'color-sky-blue', 'color-grape', 'color-peach-deep', 'color-cotton-candy', 'color-moss',
-            'color-rust-red', 'color-baby-blue', 'color-blackberry', 'color-mango', 'color-rose-gold', 'color-lime',
-            'color-burnt-orange', 'color-ice-blue', 'color-eggplant', 'color-papaya', 'color-blush-pink', 'color-chartreuse',
-            'color-cinnamon', 'color-arctic-blue', 'color-boysenberry', 'color-cantaloupe', 'color-dusty-rose', 'color-spring-green',
-            'color-paprika', 'color-ocean-blue', 'color-mulberry', 'color-persimmon', 'color-mauve-pink', 'color-kelly-green'
-        ];
+        // Removed random color system for cleaner UI design
         
-        function getRandomColors() {
-            // Shuffle the colors array
-            const shuffled = [...teamColors].sort(() => 0.5 - Math.random());
-            // Return first two different colors
-            return [shuffled[0], shuffled[1]];
-        }
+        // Functions removed for cleaner UI design
         
-        function applyRandomTeamColors() {
-            const [color1, color2] = getRandomColors();
-            
-            // Apply colors to team sections
-            const saveznici = document.getElementById('team-saveznici');
-            const gejaci = document.getElementById('team-gejaci');
-            
-            if (saveznici && gejaci) {
-                // Remove any existing color classes
-                saveznici.className = saveznici.className.replace(/color-\w+/g, '');
-                gejaci.className = gejaci.className.replace(/color-\w+/g, '');
-                
-                // Apply new colors
-                saveznici.querySelector('.team-header').classList.add(color1);
-                gejaci.querySelector('.team-header').classList.add(color2);
-            }
-        }
+        // Functions removed for cleaner UI design
         
-        function applyRandomLeagueColors() {
-            // List of teams to color
-            const coloredTeams = ['Sport bar 22', 'NEPOBEDIVI', 'Hell Patrol', 'ValjevoJeSvetoMesto', 'grmilica', 'mixXx007'];
-            
-            // Get random colors for each team
-            const shuffledColors = [...teamColors].sort(() => 0.5 - Math.random());
-            
-            // Find all rows with colored teams
-            const leagueTable = document.getElementById('league-table');
-            if (leagueTable) {
-                const rows = leagueTable.querySelectorAll('tbody tr.colored-team');
-                console.log('Found colored team rows:', rows.length);
-                
-                rows.forEach((row, index) => {
-                    const teamName = row.getAttribute('data-team-name');
-                    const playerName = row.getAttribute('data-player-name');
-                    const shouldColor = coloredTeams.includes(teamName) || coloredTeams.includes(playerName);
-                    console.log('Processing team:', teamName, 'player:', playerName, 'Should be colored:', shouldColor);
-                    
-                    if (shouldColor) {
-                        // Remove any existing color classes
-                        row.className = row.className.replace(/color-\w+(-\w+)*(-\w+)*/g, '');
-                        row.classList.add('colored-team'); // Keep the colored-team class
-                        
-                        // Add random color
-                        const colorClass = shuffledColors[index % shuffledColors.length];
-                        row.classList.add(colorClass);
-                        console.log('Applied color class:', colorClass, 'to team:', teamName, 'player:', playerName);
-                    }
-                });
-                
-                // Also check all rows to see what team names are available
-                const allRows = leagueTable.querySelectorAll('tbody tr');
-                console.log('All league teams found:');
-                allRows.forEach(row => {
-                    const teamName = row.getAttribute('data-team-name');
-                    const playerName = row.getAttribute('data-player-name');
-                    console.log('- Team:', teamName, 'Player:', playerName);
-                });
-            } else {
-                console.log('League table not found!');
-            }
-        }
-
         function showPlayersPopup(button) {
             const entryId = button.getAttribute('data-entry-id');
             const teamName = button.getAttribute('data-team-name');
-            const playersData = JSON.parse(button.getAttribute('data-players'));
+            const waitingData = JSON.parse(button.getAttribute('data-waiting') || '[]');
+            const playingData = JSON.parse(button.getAttribute('data-playing') || '[]');
             
             // Set popup title
-            document.getElementById('popup-team-name').textContent = teamName + ' - Igrači koji još čekaju';
+            document.getElementById('popup-team-name').textContent = teamName + ' - Igrači koji nisu završili';
             
             // Build players list HTML
             let playersHTML = '';
-            if (playersData && playersData.length > 0) {
-                playersData.forEach(player => {
+            
+            // Add currently playing players (green)
+            if (playingData && playingData.length > 0) {
+                playingData.forEach(player => {
                     let badges = '';
                     
                     if (player.is_triple_captain) {
@@ -1485,13 +1835,37 @@
                     }
                     
                     playersHTML += `
-                        <div class="player-item">
+                        <div class="player-item live-playing">
+                            <span class="player-name">${player.name} 🔴 LIVE</span>
+                            ${badges}
+                        </div>
+                    `;
+                });
+            }
+            
+            // Add waiting players (normal)
+            if (waitingData && waitingData.length > 0) {
+                waitingData.forEach(player => {
+                    let badges = '';
+                    
+                    if (player.is_triple_captain) {
+                        badges += '<span class="triple-captain-badge">3xC</span>';
+                    } else if (player.is_captain) {
+                        badges += '<span class="captain-badge">C</span>';
+                    } else if (player.is_vice_captain) {
+                        badges += '<span class="vice-captain-badge">VC</span>';
+                    }
+                    
+                    playersHTML += `
+                        <div class="player-item waiting">
                             <span class="player-name">${player.name}</span>
                             ${badges}
                         </div>
                     `;
                 });
-            } else {
+            }
+            
+            if (!playingData.length && !waitingData.length) {
                 playersHTML = '<div class="player-item"><span class="player-name">Svi igrači su završili</span></div>';
             }
             
@@ -1512,6 +1886,39 @@
             }
         });
 
+        // Load tab data lazily
+        function loadTabData(tabName) {
+            showLoadingIndicator();
+            
+            fetch(`/api/load-tab-data/${tabName}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (tabName === 'main') {
+                        // Update main tab with loaded data
+                        window.standings = data.standings;
+                        window.gameweek_data = data.gameweek_data;
+                        window.league_data = data.league_data;
+                        window.highest_scoring_player = data.highest_scoring_player;
+                        updateMainTab();
+                    } else if (tabName === 'analytics') {
+                        // Update analytics tab with loaded data
+                        window.standings = data.standings;
+                        window.gameweek_data = data.gameweek_data;
+                        updateAnalyticsTab();
+                    } else if (tabName === 'nosata') {
+                        // Update nosata tab with loaded data
+                        window.nosata_data = data.nosata_data;
+                        updateNosataTab();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading tab data:', error);
+                })
+                .finally(() => {
+                    hideLoadingIndicator();
+                });
+        }
+
         function openTab(evt, tabName) {
             var i, tabcontent, tabs;
             
@@ -1531,14 +1938,26 @@
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
             
-            // Apply random colors when Detalji tab is opened
-            if (tabName === 'analytics-tab') {
-                applyRandomTeamColors();
+            // Load data for the tab if not already loaded
+            if (tabName === 'main-tab' && !window.mainTabLoaded) {
+                loadTabData('main');
+                window.mainTabLoaded = true;
+            } else if (tabName === 'analytics-tab' && !window.analyticsTabLoaded) {
+                loadTabData('analytics');
+                window.analyticsTabLoaded = true;
+                // Apply random colors when Detalji tab is opened
+                // Random coloring removed
+            } else if (tabName === 'nosata-tab' && !window.nosataTabLoaded) {
+                loadTabData('nosata');
+                window.nosataTabLoaded = true;
+            } else if (tabName === 'analytics-tab') {
+                // Apply random colors when Detalji tab is opened
+                // Random coloring removed
             }
             
             // Apply random colors when League tab is opened
             if (tabName === 'league-tab') {
-                applyRandomLeagueColors();
+                // Random coloring removed
             }
         }
 
@@ -1633,37 +2052,6 @@
             }
         }
         
-        function createSnowfall() {
-            const container = document.getElementById('animation-container');
-            const snowflakes = ['❄', '❅', '❆', '✦', '✧', '⋄'];
-            const numberOfSnowflakes = 30;
-
-            for (let i = 0; i < numberOfSnowflakes; i++) {
-                const snowflake = document.createElement('div');
-                snowflake.className = 'snowflake';
-                snowflake.innerHTML = snowflakes[Math.floor(Math.random() * snowflakes.length)];
-                
-                // Random horizontal position
-                snowflake.style.left = Math.random() * 100 + '%';
-                
-                // Random animation duration (3-6 seconds)
-                const duration = Math.random() * 3 + 3;
-                snowflake.style.animationDuration = duration + 's';
-                
-                // Random delay to stagger the snowflakes
-                snowflake.style.animationDelay = Math.random() * 2 + 's';
-                
-                // Random size
-                const size = Math.random() * 10 + 10;
-                snowflake.style.fontSize = size + 'px';
-                
-                // Random opacity
-                snowflake.style.opacity = Math.random() * 0.6 + 0.4;
-
-                container.appendChild(snowflake);
-            }
-        }
-
         function createDynamicAnimation() {
             const container = document.getElementById('animation-container');
             
@@ -1694,9 +2082,8 @@
                 console.log('GEJACI pobeđuju! Kiša! 🌧️');
                 createRainfall();
             } else {
-                // It's a tie or no data - show snow (neutral)
-                console.log('Nerešeno ili nema podataka! Sneg! ❄️');
-                createSnowfall();
+                // It's a tie or no data - show nothing (neutral)
+                console.log('Nerešeno ili nema podataka!');
             }
 
             // Remove animation after 5 seconds
@@ -1712,7 +2099,181 @@
         // Start dynamic animation when page loads
         window.addEventListener('load', () => {
             createDynamicAnimation();
+            
+            // Register service worker for mobile optimization
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(error => console.log('SW registration failed'));
+            }
         });
+
+        // Team details popup functionality
+        function showTeamDetails(button) {
+            const entryId = button.getAttribute('data-entry-id');
+            const playerName = button.getAttribute('data-player-name');
+            
+            if (!entryId) {
+                alert('Nema podataka o timu za ovog igrača.');
+                return;
+            }
+            
+            // Show global loading
+            showLoadingForRequest();
+            
+            // Show loading state on button
+            button.disabled = true;
+            button.textContent = 'Učitavam...';
+            
+            // Fetch team details
+            fetch(`/api/team-details/${entryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Greška pri učitavanju tima: ' + data.error);
+                    } else {
+                        showTeamDetailsModal(data, playerName);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching team details:', error);
+                    alert('Greška pri učitavanju detalja tima.');
+                })
+                .finally(() => {
+                    // Hide global loading
+                    hideLoadingForRequest();
+                    button.disabled = false;
+                    button.textContent = 'Pogledaj tim';
+                });
+        }
+
+        function showTeamDetailsModal(teamData, playerName) {
+            // Create modal overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'team-details-overlay';
+            overlay.onclick = () => closeTeamDetailsModal();
+            
+            // Create modal content
+            const modal = document.createElement('div');
+            modal.className = 'team-details-modal';
+            modal.onclick = (e) => e.stopPropagation();
+            
+            // Create content
+            let content = `
+                <div class="team-details-header">
+                    <h2>${playerName} - Tim detalji</h2>
+                    <button class="close-team-details" onclick="closeTeamDetailsModal()">✕</button>
+                </div>
+                <div class="team-details-content">
+            `;
+            
+            // Starting XI
+            if (teamData.starting_xi && teamData.starting_xi.length > 0) {
+                content += `
+                    <div class="team-section">
+                        <h3>Početna postava (11)</h3>
+                        <div class="players-formation">
+                `;
+                
+                teamData.starting_xi.forEach(player => {
+                    const captainBadge = player.is_captain ? '<span class="captain-badge">C</span>' : 
+                                       player.is_vice_captain ? '<span class="vice-captain-badge">VC</span>' : '';
+                    const multiplier = player.multiplier > 1 ? ` (${player.multiplier}x)` : '';
+                    
+                    content += `
+                        <div class="player-item starting-player">
+                            <span class="player-name">${player.name}${captainBadge}</span>
+                            <span class="player-points">${player.points}${multiplier}</span>
+                        </div>
+                    `;
+                });
+                
+                content += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Substitutes/Bench
+            if (teamData.bench && teamData.bench.length > 0) {
+                content += `
+                    <div class="team-section">
+                        <h3>Klupa (${teamData.bench.length})</h3>
+                        <div class="players-formation bench-players">
+                `;
+                
+                teamData.bench.forEach(player => {
+                    content += `
+                        <div class="player-item bench-player">
+                            <span class="player-name">${player.name}</span>
+                            <span class="player-points">${player.points}</span>
+                        </div>
+                    `;
+                });
+                
+                content += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Chips info
+            if (teamData.active_chip) {
+                content += `
+                    <div class="team-section">
+                        <h3>Aktivni čip</h3>
+                        <div class="chip-info">
+                            <span class="chip-name">${teamData.active_chip}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Total points
+            content += `
+                <div class="team-section">
+                    <div class="team-totals">
+                        <div class="total-item">
+                            <span class="total-label">Ukupno poena:</span>
+                            <span class="total-value">${teamData.total_points || 0}</span>
+                        </div>
+                        <div class="total-item">
+                            <span class="total-label">Poeni sa klupe:</span>
+                            <span class="total-value">${teamData.bench_points || 0}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            content += `</div>`;
+            
+            modal.innerHTML = content;
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+        }
+
+        function closeTeamDetailsModal() {
+            const overlay = document.querySelector('.team-details-overlay');
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+
+        // Update functions for lazy loading
+        function updateMainTab() {
+            // Re-render the main tab content with fresh data
+            location.reload(); // Simple approach - reload the page
+        }
+
+        function updateAnalyticsTab() {
+            // Re-render analytics tab content
+            // Random coloring removed
+        }
+
+        function updateNosataTab() {
+            // Re-render nosata tab content
+            // Random coloring removed
+        }
     </script>
     <!-- Players Popup -->
     <div id="players-popup-overlay" class="players-popup-overlay" onclick="closePlayersPopup()">
