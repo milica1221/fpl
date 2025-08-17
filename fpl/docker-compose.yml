@@ -13,11 +13,4 @@ services:
     environment:
       - FLASK_ENV=production
       - FLASK_APP=app.py
-      - REDIS_URL=redis://redis:6379/0
     restart: unless-stopped
-    depends_on:
-      - redis
-
-
-volumes:
-  redis_data:

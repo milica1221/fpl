@@ -446,7 +446,8 @@ def index():
     colored_teams = ["Sport bar 22", "NEPOBEDIVI", "Hell Patrol", "ValjevoJeSvetoMesto", "grmilica", "mixXx007"]
     
     print("🔄 Rendering index template with data...")
-    
+    print("Team 1 Scores:", team1_scores)
+    print("Team 2 Scores:", team2_scores)
     return render_template('index.html', 
                            team1_scores=team1_scores, 
                            team2_scores=team2_scores, 
