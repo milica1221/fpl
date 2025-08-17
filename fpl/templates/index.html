@@ -256,70 +256,6 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        /* Dynamic Animation based on team results */
-        .animation-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9999;
-            overflow: hidden;
-        }
-
-        .firework-particle {
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        .raindrop {
-            position: absolute;
-            color: #87CEEB;
-            user-select: none;
-            pointer-events: none;
-            font-size: 14px;
-            animation-name: rainfall;
-            animation-timing-function: linear;
-            animation-iteration-count: 1;
-        }
-
-        @keyframes fireworkExplode {
-            0% {
-                transform: scale(0);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 0;
-            }
-        }
-
-        @keyframes rainfall {
-            0% {
-                transform: translateY(-100vh) translateX(0px);
-                opacity: 0.8;
-            }
-            100% {
-                transform: translateY(100vh) translateX(-50px);
-                opacity: 0;
-            }
-        }
-
-        .animation-container.fade-out {
-            animation: fadeOut 1s ease-out forwards;
-        }
-
-        @keyframes fadeOut {
-            0% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-            }
-        }
-
         /* Tab Styles */
         .tab-container {
             display: flex;
@@ -1385,9 +1321,6 @@
             Učitavam FPL podatke<span class="loading-dots"></span>
         </div>
     </div>
-
-    <!-- Dynamic Animation Container -->
-    <div class="animation-container" id="animation-container"></div>
     
     <h1>FPL Kalkulator</h1>
     
@@ -1441,11 +1374,14 @@
                 {% if team1_live and team2_live %}
                 <tr class="live-row">
                     <td>LIVE ({{ current_event }})</td>
-                    {% for live_data in team1_live %}
-                        <td>{{ live_data.total_points if live_data else '-' }}</td>
+                    <!-- Koristi isti redosled kao za obične redove - team1_scores + team2_scores -->
+                    {% for team_data in team1_scores %}
+                        {% set live_player = team1_live|selectattr('entry_id', 'equalto', team_data.entry_id)|first %}
+                        <td>{{ live_player.total_points if live_player else '-' }}</td>
                     {% endfor %}
-                    {% for live_data in team2_live %}
-                        <td>{{ live_data.total_points if live_data else '-' }}</td>
+                    {% for team_data in team2_scores %}
+                        {% set live_player = team2_live|selectattr('entry_id', 'equalto', team_data.entry_id)|first %}
+                        <td>{{ live_player.total_points if live_player else '-' }}</td>
                     {% endfor %}
                     {% set team1_live_total = team1_live[0].total_points + team1_live[1].total_points + team1_live[2].total_points if team1_live and team1_live|length >= 3 else 0 %}
                     {% set team2_live_total = team2_live[0].total_points + team2_live[1].total_points + team2_live[2].total_points if team2_live and team2_live|length >= 3 else 0 %}
@@ -1702,12 +1638,12 @@
             <table id="league-table">
                 <thead>
                     <tr>
-                        <th onclick="sortTable(0, 'league-table')" style="cursor: pointer;">Rank ⇅</th>
-                        <th onclick="sortTable(1, 'league-table')" style="cursor: pointer;">Team ⇅</th>
-                        <th onclick="sortTable(2, 'league-table')" style="cursor: pointer;">Manager ⇅</th>
-                        <th onclick="sortTable(3, 'league-table')" style="cursor: pointer;">GW{{ display_event }} ⇅</th>
-                        <th onclick="sortTable(4, 'league-table')" style="cursor: pointer;">To Play ⇅</th>
-                        <th onclick="sortTable(5, 'league-table')" style="cursor: pointer;">Captain ⇅</th>
+                        <th >Rank</th>
+                        <th >Team</th>
+                        <th >Manager</th>
+                        <th >GW{{ display_event }}</th>
+                        <th >To Play</th>
+                        <th >Captain</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1769,8 +1705,6 @@
             // Show loading on page refresh or initial load
             showLoading();
             
-            // Always start with preloading critical data
-            preloadCriticalData();
             
             // Hide loading when everything is loaded
             window.addEventListener('load', function() {
@@ -1788,30 +1722,6 @@
             });
         });
 
-        function preloadCriticalData() {
-            // Preload player names and bootstrap data in background
-            // This helps speed up subsequent requests
-            fetch('/api/bootstrap-preload')
-                .then(response => response.json())
-                .catch(error => console.log('Preload completed (expected):', error));
-        }
-
-        function loadDataProgressively() {
-            // Progressive data loading for fast mode
-            setTimeout(() => {
-                fetch('/api/load-full-data')
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Basic data loaded:', data);
-                        // Here you could update UI with basic data
-                        setTimeout(() => hideLoading(), 1000);
-                    })
-                    .catch(error => {
-                        console.error('Error loading data:', error);
-                        setTimeout(() => hideLoading(), 500);
-                    });
-            }, 500);
-        }
 
         function showLoading() {
             const overlay = document.getElementById('loading-overlay');
@@ -1850,44 +1760,6 @@
             hideLoading();
         }
 
-        function sortTable(columnIndex, tableId) {
-            var table = document.getElementById(tableId);
-            var tbody = table.querySelector('tbody');
-            var rows = Array.from(tbody.rows);
-            
-            // Determine sort direction
-            var isAscending = table.getAttribute('data-sort-dir') === 'asc';
-            table.setAttribute('data-sort-dir', isAscending ? 'desc' : 'asc');
-            
-            rows.sort(function(a, b) {
-                var aVal = a.cells[columnIndex].textContent.trim();
-                var bVal = b.cells[columnIndex].textContent.trim();
-                
-                // Try to parse as numbers first
-                var aNum = parseFloat(aVal);
-                var bNum = parseFloat(bVal);
-                
-                if (!isNaN(aNum) && !isNaN(bNum)) {
-                    // Numeric comparison
-                    return isAscending ? aNum - bNum : bNum - aNum;
-                } else {
-                    // String comparison for non-numeric columns
-                    return isAscending ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-                }
-            });
-            
-            // Re-append sorted rows and update ranks
-            rows.forEach(function(row, index) {
-                row.cells[0].textContent = index + 1; // Update rank
-                tbody.appendChild(row);
-            });
-        }
-        // Array of available colors for teams
-        // Removed random color system for cleaner UI design
-        
-        // Functions removed for cleaner UI design
-        
-        // Functions removed for cleaner UI design
         
         function showPlayersPopup(button) {
             const entryId = button.getAttribute('data-entry-id');
@@ -1916,7 +1788,7 @@
                     
                     playersHTML += `
                         <div class="player-item live-playing">
-                            <span class="player-name">${player.name} 🔴 LIVE</span>
+                            <span class="player-name">${player.name}LIVE</span>
                             ${badges}
                         </div>
                     `;
@@ -2041,146 +1913,8 @@
             }
         }
 
-        // Dynamic Animation based on team results
-        function createFireworks() {
-            const container = document.getElementById('animation-container');
-            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'];
-            
-            // Create multiple firework explosions
-            for (let i = 0; i < 8; i++) {
-                setTimeout(() => {
-                    const firework = document.createElement('div');
-                    firework.style.position = 'absolute';
-                    firework.style.left = Math.random() * 80 + 10 + '%';
-                    firework.style.top = Math.random() * 60 + 20 + '%';
-                    
-                    // Create explosion particles
-                    for (let j = 0; j < 30; j++) {
-                        const particle = document.createElement('div');
-                        particle.className = 'firework-particle';
-                        particle.style.width = Math.random() * 8 + 4 + 'px';
-                        particle.style.height = particle.style.width;
-                        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                        particle.style.position = 'absolute';
-                        particle.style.left = '50%';
-                        particle.style.top = '50%';
-                        
-                        const angle = (j / 30) * 2 * Math.PI;
-                        const velocity = Math.random() * 100 + 50;
-                        const duration = Math.random() * 1000 + 1000;
-                        
-                        particle.style.animation = `fireworkExplode ${duration}ms ease-out forwards`;
-                        particle.style.transform = `translate(-50%, -50%)`;
-                        
-                        // Animate particle movement
-                        setTimeout(() => {
-                            particle.style.transform = `translate(${Math.cos(angle) * velocity}px, ${Math.sin(angle) * velocity}px)`;
-                            particle.style.transition = `transform ${duration}ms ease-out`;
-                        }, 10);
-                        
-                        firework.appendChild(particle);
-                        
-                        // Remove particle after animation
-                        setTimeout(() => {
-                            if (particle.parentNode) {
-                                particle.parentNode.removeChild(particle);
-                            }
-                        }, duration + 100);
-                    }
-                    
-                    container.appendChild(firework);
-                    
-                    // Remove firework container after particles are done
-                    setTimeout(() => {
-                        if (firework.parentNode) {
-                            firework.parentNode.removeChild(firework);
-                        }
-                    }, 2000);
-                    
-                }, i * 300); // Stagger fireworks
-            }
-        }
-        
-        function createRainfall() {
-            const container = document.getElementById('animation-container');
-            const raindrops = ['💧', '🌧️', '💙', '🔵', '💧'];
-            const numberOfDrops = 40;
-
-            for (let i = 0; i < numberOfDrops; i++) {
-                const raindrop = document.createElement('div');
-                raindrop.className = 'raindrop';
-                raindrop.innerHTML = raindrops[Math.floor(Math.random() * raindrops.length)];
-                
-                // Random horizontal position
-                raindrop.style.left = Math.random() * 100 + '%';
-                
-                // Random animation duration (1-3 seconds)
-                const duration = Math.random() * 2 + 1;
-                raindrop.style.animationDuration = duration + 's';
-                
-                // Random delay to stagger the raindrops
-                raindrop.style.animationDelay = Math.random() * 2 + 's';
-                
-                // Random size
-                const size = Math.random() * 8 + 12;
-                raindrop.style.fontSize = size + 'px';
-                
-                // Random opacity
-                raindrop.style.opacity = Math.random() * 0.4 + 0.6;
-
-                container.appendChild(raindrop);
-            }
-        }
-        
-        function createDynamicAnimation() {
-            const container = document.getElementById('animation-container');
-            
-            // Try to get team points from DOM elements
-            let team1Points = 0;
-            let team2Points = 0;
-            
-            // Look for team points in the page - they are in team-count elements
-            const teamCountElements = document.querySelectorAll('.team-count');
-            
-            // Team points are typically in the second set of team-count elements (index 2 and 3)
-            if (teamCountElements.length >= 4) {
-                const team1PointsText = teamCountElements[2]?.textContent?.trim();
-                const team2PointsText = teamCountElements[3]?.textContent?.trim();
-                
-                team1Points = parseInt(team1PointsText) || 0;
-                team2Points = parseInt(team2PointsText) || 0;
-            }
-            
-            console.log(`SAVEZNICI: ${team1Points} poena, GEJACI: ${team2Points} poena`);
-            
-            if (team1Points > team2Points && team1Points > 0) {
-                // SAVEZNICI are winning - show fireworks!
-                console.log('SAVEZNICI pobeđuju! Vatromet! 🎆');
-                createFireworks();
-            } else if (team2Points > team1Points && team2Points > 0) {
-                // GEJACI are winning - show rain!
-                console.log('GEJACI pobeđuju! Kiša! 🌧️');
-                createRainfall();
-            } else {
-                // It's a tie or no data - show nothing (neutral)
-                console.log('Nerešeno ili nema podataka!');
-            }
-
-            // Remove animation after 5 seconds
-            setTimeout(() => {
-                container.classList.add('fade-out');
-                setTimeout(() => {
-                    container.innerHTML = ''; // Clear all animations
-                    container.classList.remove('fade-out');
-                }, 1000); // Wait for fade animation to complete
-            }, 5000);
-        }
-
-        // Start dynamic animation when page loads
+        // Register service worker for mobile optimization when page loads
         window.addEventListener('load', () => {
-            createDynamicAnimation();
-            
-            // Register service worker for mobile optimization
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/static/sw.js')
                     .then(registration => console.log('SW registered'))
@@ -2345,15 +2079,6 @@
             location.reload(); // Simple approach - reload the page
         }
 
-        function updateAnalyticsTab() {
-            // Re-render analytics tab content
-            // Random coloring removed
-        }
-
-        function updateNosataTab() {
-            // Re-render nosata tab content
-            // Random coloring removed
-        }
     </script>
     <!-- Players Popup -->
     <div id="players-popup-overlay" class="players-popup-overlay" onclick="closePlayersPopup()">
