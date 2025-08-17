@@ -381,6 +381,114 @@
             margin: 20px 0;
         }
 
+        /* Force single column layout on all mobile devices */
+        @media (max-width: 1024px) {
+            .teams-analytics-container {
+                grid-template-columns: 1fr !important;
+                gap: 25px;
+                margin: 20px 10px;
+            }
+        }
+
+        /* Mobile Responsive for Team Analytics */
+        @media (max-width: 768px) {
+            .teams-analytics-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                margin: 15px 10px;
+            }
+            
+            .team-analytics-section {
+                padding: 15px;
+            }
+            
+            .team-header {
+                margin-bottom: 20px;
+                padding: 12px;
+            }
+            
+            .team-header h2 {
+                font-size: 24px;
+            }
+            
+            .team-stats-summary {
+                flex-direction: column;
+                gap: 5px;
+                text-align: center;
+            }
+            
+            .players-grid {
+                gap: 12px;
+            }
+            
+            .player-card {
+                padding: 12px;
+            }
+            
+            .player-header h3 {
+                font-size: 16px;
+            }
+            
+            .stat-row {
+                padding: 6px 0;
+            }
+            
+            .stat-label, .stat-value {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .teams-analytics-container {
+                margin: 10px 5px;
+                gap: 15px;
+            }
+            
+            .team-analytics-section {
+                padding: 12px;
+            }
+            
+            .team-header {
+                margin-bottom: 15px;
+                padding: 10px;
+            }
+            
+            .team-header h2 {
+                font-size: 20px;
+            }
+            
+            .player-card {
+                padding: 10px;
+            }
+            
+            .player-header {
+                margin-bottom: 10px;
+                padding-bottom: 8px;
+            }
+            
+            .player-header h3 {
+                font-size: 15px;
+            }
+            
+            .player-points {
+                font-size: 16px;
+            }
+            
+            .stat-row {
+                padding: 5px 0;
+            }
+            
+            .player-actions {
+                margin-top: 10px;
+                padding-top: 10px;
+            }
+            
+            .view-team-btn {
+                padding: 6px 12px;
+                font-size: 11px;
+            }
+        }
+
         .team-analytics-section {
             background-color: #222;
             border-radius: 15px;
